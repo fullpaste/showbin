@@ -1,0 +1,31 @@
+<!-- SHARED NAV - included by all pages -->
+<link rel="stylesheet" href="nav.css">
+<nav>
+    <div class="container">
+        <div class="nav-brand">
+            <a href="index.html">Showbin</a>
+            
+        </div>
+        <button class="navbar-toggler" type="button">☰</button>
+        <div class="nav-wrapper">
+            <ul class="nav-menu">
+                <li id="nav-home"><a href="index.html">Home</a></li>
+                <li id="nav-add"><a href="add.html">Add Paste</a></li>
+                <li id="nav-users"><a href="users.html">Users</a></li>
+                <li id="nav-upgrades"><a href="upgrades.html">Upgrades</a></li>
+                <li id="nav-hof"><a href="hof.html">Hall of Fame</a></li>
+                <li id="nav-contact"><a href="contact.html">Contact</a></li>
+            </ul>
+            <style>
+                .online-count { display:flex; align-items:center; color:#00ff00; font-size:12px; }
+                .online-count::before { content:''; display:inline-block; width:6px; height:6px; background:#00ff00; border-radius:50%; margin-right:6px; animation:pulse 2s infinite; box-shadow:0 0 0 0 rgba(0,255,0,0.7); }
+                @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(0,255,0,0.7)} 70%{box-shadow:0 0 0 6px rgba(0,255,0,0)} 100%{box-shadow:0 0 0 0 rgba(0,255,0,0)} }
+            </style>
+            <div class="online-count desktop-only" id="online-count-desktop" style="display:none;">0</div>
+            <div class="nav-auth">
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html">Register</a></li>
+            </div>
+        </div>
+    </div>
+</nav>

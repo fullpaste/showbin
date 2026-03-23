@@ -1,0 +1,644 @@
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+    <title>Upgrades | Showbin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="all.min.css">
+    <link rel="stylesheet" href="nav.css">
+    <style>
+        input { outline: none !important; box-shadow: none !important; }
+        input:focus { outline: none !important; box-shadow: none !important; }
+        *:focus { outline: none !important; box-shadow: none !important; }
+        input, textarea, select { font-size: 16px !important; }
+        ::-webkit-scrollbar { display: none; }
+        html { -ms-overflow-style: none; scrollbar-width: none; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+
+    .main-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        min-height: calc(100vh - 88px);
+        display: flex;
+        align-items: center;
+    }
+
+    .upgrade-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        width: 100%;
+    }
+
+    .upgrade-card {
+        border: 1px solid #222;
+        padding: 15px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .upgrade-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #222;
+    }
+
+    .upgrade-name {
+        font-size: 1.2rem;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+    }
+
+    .upgrade-price {
+        font-size: 1.2rem;
+        color: #fff;
+        font-weight: 300;
+    }
+
+    .perks-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex: 1;
+    }
+
+    .perk-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+        color: #fff;
+        font-size: 0.8rem;
+        letter-spacing: 0.2px;
+    }
+
+    .perk-value { text-align: right; }
+    .perk-value.yes { color: green; }
+    .perk-value.no  { color: red; }
+    .perk-value i.material-icons { font-size: 15px; font-weight: bold; }
+
+    /* ── HARMFUL: red/white animated gradient ── */
+    @keyframes grad-harmful {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .harmful-title, .perk-value.harmful {
+        background: linear-gradient(90deg, #ff4444, #ffaaaa, #ffffff, #ff6b6b, #ff2222, #ffcccc, #ff4444);
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: grad-harmful 3s ease infinite;
+        font-weight: bold;
+    }
+
+    /* ── RICH: green/white animated gradient ── */
+    @keyframes grad-rich {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .rich-title, .perk-value.rich {
+        background: linear-gradient(90deg, #00cc44, #aaffaa, #ffffff, #55ff88, #00aa33, #ccffcc, #00cc44);
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: grad-rich 3s ease infinite;
+        font-weight: bold;
+    }
+
+    /* ── BOSS: black/white animated gradient ── */
+    @keyframes grad-boss {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .boss-title, .perk-value.boss {
+        background: linear-gradient(90deg, #ffffff, #aaaaaa, #333333, #888888, #111111, #cccccc, #ffffff);
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: grad-boss 3s ease infinite;
+        font-weight: bold;
+    }
+
+    /* Title sparkle inline canvas */
+    .upgrade-name { position: relative; display: inline-flex; align-items: center; }
+    .title-sparkle {
+        display: inline-block;
+        vertical-align: middle;
+        pointer-events: none;
+        margin-left: 2px;
+        opacity: 0.9;
+    }
+
+    /* Chroma Color title — rainbow animated */
+    @keyframes grad-chroma {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .chroma-color-title {
+        background: linear-gradient(90deg, #BB71E4,#ffffff,#365DDA,#ffffff,#94FAAC,#ffffff,#F96D31,#ffffff,#FF69B4,#ffffff,#BB71E4);
+        background-size: 400% 400%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: grad-chroma 4s ease infinite;
+        font-weight: bold;
+    }
+
+    /* Chroma swatches: solid color fading to white */
+    @keyframes chroma-sw {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .chroma-swatch {
+        background: linear-gradient(135deg, var(--c), #ffffff, var(--c)) !important;
+        background-size: 300% 300% !important;
+        animation: chroma-sw 3s ease infinite;
+    }
+
+    /* ── SPARKLE CANVAS ── */
+    .sparkle-canvas {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        pointer-events: none;
+        z-index: 0;
+    }
+    .upgrade-card > *:not(.sparkle-canvas) { position: relative; z-index: 1; }
+
+    .purchase-btn {
+        display: block;
+        width: 100%;
+        padding: 8px;
+        margin-top: 15px;
+        background: #222;
+        color: #fff;
+        text-align: center;
+        text-decoration: none;
+        border: 0px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+    .purchase-btn:hover { background: #111; }
+
+    .color-grid {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 3px;
+        margin-top: 10px;
+    }
+    .color-box { aspect-ratio: 1; border: 1px solid #222; cursor: pointer; }
+    .preview-name { color: inherit; }
+
+    /* ── PURCHASE MODAL ── */
+    .buy-modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.85);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+    }
+    .buy-modal.show { display: flex; }
+    .buy-modal-box {
+        background: #111;
+        border: 1px solid #333;
+        padding: 30px 28px;
+        max-width: 380px;
+        width: 90%;
+        text-align: center;
+        position: relative;
+    }
+    .buy-modal-close {
+        position: absolute; top: 10px; right: 14px;
+        background: none; border: none; color: #666;
+        font-size: 22px; cursor: pointer; line-height: 1;
+    }
+    .buy-modal-close:hover { color: #fff; }
+    .buy-modal-title {
+        font-size: 1.1rem; font-weight: 600; color: #fff;
+        margin-bottom: 8px;
+    }
+    .buy-modal-sub {
+        font-size: 0.85rem; color: #888; margin-bottom: 22px; line-height: 1.5;
+    }
+    .buy-modal-discord {
+        display: inline-flex; align-items: center; gap: 9px;
+        background: #5865F2;
+        color: #fff;
+        padding: 11px 22px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        transition: background 0.15s;
+    }
+    .buy-modal-discord:hover { background: #4752c4; }
+    .buy-modal-discord svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+    @media screen and (max-width: 768px) {
+        .main-container { padding: 20px 10px; min-height: auto; align-items: flex-start; }
+        .upgrade-grid { grid-template-columns: repeat(2,1fr); gap: 20px 10px; }
+        .upgrade-card { padding: 10px; }
+        .upgrade-name { font-size: 1rem; }
+        .upgrade-price { font-size: 1rem; }
+        .perk-item { font-size: 0.75rem; }
+        .purchase-btn { padding: 6px; margin-top: 10px; font-size: 0.8rem; }
+    }
+    @media screen and (max-width: 480px) {
+        .upgrade-grid { grid-template-columns: repeat(2,1fr); gap: 25px 8px; }
+        .main-container { padding: 15px 8px; }
+        .upgrade-card { padding: 8px; }
+        .perk-item { font-size: 0.7rem; }
+    }
+    </style>
+
+    <link rel="stylesheet" href="nav.css">
+<nav>
+    <div class="container">
+        <div class="nav-brand">
+            <a href="index.html">Showbin</a>
+            <div class="online-count mobile-only" style="display:none;">0</div>
+        </div>
+        <button class="navbar-toggler" type="button">☰</button>
+        <div class="nav-wrapper">
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="add.html">Add Paste</a></li>
+                <li><a href="users.html">Users</a></li>
+                <li class="active"><a href="upgrades.html">Upgrades</a></li>
+                <li><a href="hof.html">Hall of Shame</a></li>
+                <li><a href="#" onclick="openContact(event)">Contact</a></li>
+            </ul>
+            <style>
+                .online-count { display:flex; align-items:center; color:#00ff00; font-size:12px; }
+                .online-count::before { content:''; display:inline-block; width:6px; height:6px; background:#00ff00; border-radius:50%; margin-right:6px; animation:pulse 2s infinite; box-shadow:0 0 0 0 rgba(0,255,0,.7); }
+                @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(0,255,0,.7)} 70%{box-shadow:0 0 0 6px rgba(0,255,0,0)} 100%{box-shadow:0 0 0 0 rgba(0,255,0,0)} }
+                .online-count.mobile-only { display:none !important; }
+                .online-count.mobile-only.connected { display:none !important; }
+            </style>
+            <div class="online-count desktop-only" style="display:none;">0</div>
+            <div class="nav-auth">
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html">Register</a></li>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <div class="main-container">
+        <div class="upgrade-grid">
+
+            <!-- HARMFUL -->
+            <div class="upgrade-card">
+                <canvas class="sparkle-canvas" data-colors="#ff4444,#ff8888,#ffaaaa,#ffffff,#ff2222"></canvas>
+                <div class="upgrade-title">
+                    <span class="upgrade-name harmful-title">Harmful <canvas class="title-sparkle" data-colors="#ff4444,#ffaaaa,#ffffff" width="40" height="24"></canvas></span>
+                    <span class="upgrade-price">$15</span>
+                </div>
+                <ul class="perks-list">
+                    <li class="perk-item"><span>Preview</span><span class="perk-value harmful"><span class="preview-name">Anonymous</span> [Harmful]</span></li>
+                    <li class="perk-item"><span>Color</span><span class="perk-value harmful">Light Red Chroma</span></li>
+                    <li class="perk-item"><span>Chat cooldown</span><span class="perk-value harmful">10s</span></li>
+                    <li class="perk-item"><span>.GIF profile picture</span><span class="perk-value yes"><i class="material-icons">check</i></span></li>
+                    <li class="perk-item"><span>Banner on profile</span><span class="perk-value yes"><i class="material-icons">check</i></span></li>
+                    <li class="perk-item"><span>Edit pastes</span><span class="perk-value yes"><i class="material-icons">check</i></span></li>
+                    <li class="perk-item"><span>Quality support</span><span class="perk-value yes"><i class="material-icons">check</i></span></li>
+                    <li class="perk-item"><span>Username changes</span><span class="perk-value">1</span></li>
+                </ul>
+                <button class="purchase-btn">Purchase</button>
+            </div>
+
+            <!-- RICH -->
+            <div class="upgrade-card">
+                <canvas class="sparkle-canvas" data-colors="#00cc44,#55ff88,#aaffaa,#ffffff,#00ff55"></canvas>
+                <div class="upgrade-title">
+                    <span class="upgrade-name rich-title">Rich <canvas class="title-sparkle" data-colors="#00cc44,#aaffaa,#ffffff" width="40" height="24"></canvas></span>
+                    <span class="upgrade-price">$40</span>
+                </div>
+                <ul class="perks-list">
+                    <li class="perk-item"><span>Preview</span><span class="perk-value rich"><span class="preview-name">Anonymous</span> [Rich]</span></li>
+                    <li class="perk-item"><span>Color</span><span class="perk-value rich">Light Green Chroma</span></li>
+                    <li class="perk-item"><span>Links in chat</span><span class="perk-value yes" style="-webkit-text-fill-color:unset;background:none;color:green;"><i class="material-icons">check</i> <a href="#" onclick="openLinksInfo(event)" style="color:#aaffaa;font-size:11px;text-decoration:underline;">(Limits)</a></span></li>
+                    <li class="perk-item"><span>Chat cooldown</span><span class="perk-value rich">5s</span></li>
+                    <li class="perk-item"><span>Unlist your own pastes</span><span class="perk-value yes"><i class="material-icons">check</i></span></li>
+                    <li class="perk-item"><span>Private your own pastes</span><span class="perk-value yes"><i class="material-icons">check</i></span></li>
+                    <li class="perk-item"><span>Faster response</span><span class="perk-value yes"><i class="material-icons">check</i></span></li>
+                    <li class="perk-item"><span style="color:#fff;text-shadow:0 0 8px rgba(255,255,255,0.5);">All from Harmful</span><span class="perk-value yes"><i class="material-icons">check</i></span></li>
+                    <li class="perk-item"><span>Username changes</span><span class="perk-value">3</span></li>
+                </ul>
+                <button class="purchase-btn">Purchase</button>
+            </div>
+
+            <!-- BOSS -->
+            <div class="upgrade-card">
+                <canvas class="sparkle-canvas" data-colors="#ffffff,#cccccc,#aaaaaa,#888888,#eeeeee"></canvas>
+                <div class="upgrade-title">
+                    <span class="upgrade-name boss-title">Boss <canvas class="title-sparkle" data-colors="#ffffff,#cccccc,#aaaaaa" width="40" height="24"></canvas></span>
+                    <span class="upgrade-price">$80</span>
+                </div>
+                <ul class="perks-list">
+                    <li class="perk-item"><span>Preview</span><span class="perk-value boss"><span class="preview-name">Anonymous</span> [Boss]</span></li>
+                    <li class="perk-item"><span>Color</span><span class="perk-value boss">Black & White Chroma</span></li>
+                    <li class="perk-item"><span>Chat cooldown</span><span class="perk-value boss">0s</span></li>
+                    <li class="perk-item"><span>Password protected pastes</span><span class="perk-value yes"><i class="material-icons">check</i></span></li>
+                    <li class="perk-item"><span>All links in chat</span><span class="perk-value yes"><i class="material-icons">check</i></span></li>
+                    <li class="perk-item"><span>Layout presets</span><span class="perk-value yes"><i class="material-icons">check</i></span></li>
+                    <li class="perk-item"><span>Priority support</span><span class="perk-value yes"><i class="material-icons">check</i></span></li>
+                    <li class="perk-item"><span style="color:#fff;text-shadow:0 0 8px rgba(255,255,255,0.5);">All from Rich</span><span class="perk-value yes"><i class="material-icons">check</i></span></li>
+                    <li class="perk-item"><span>Username changes</span><span class="perk-value">5</span></li>
+                </ul>
+                <button class="purchase-btn">Purchase</button>
+            </div>
+
+            <!-- CHANGE COLOR $10 (chroma) -->
+            <div class="upgrade-card">
+                <canvas class="sparkle-canvas" data-colors="#BB71E4,#ffffff,#365DDA,#94FAAC,#F96D31,#FF69B4,#FFFE71"></canvas>
+                <div class="upgrade-title">
+                    <span class="upgrade-name chroma-color-title">Chroma Color</span>
+                    <span class="upgrade-price">$10</span>
+                </div>
+                <ul class="perks-list">
+                    <li class="perk-item"><span>Ability to change color</span><span class="perk-value yes"><i class="material-icons">check</i></span></li>
+                    <li class="perk-item"><span>Chroma + white gradient</span><span class="perk-value yes"><i class="material-icons">check</i></span></li>
+                    <li class="perk-item"><span>Amount of colors</span><span class="perk-value">20</span></li>
+                </ul>
+                <div class="color-grid">
+                    <div class="color-box chroma-swatch" style="--c:#BB71E4"></div>
+                    <div class="color-box chroma-swatch" style="--c:#4B2E83"></div>
+                    <div class="color-box chroma-swatch" style="--c:#FEC8D8"></div>
+                    <div class="color-box chroma-swatch" style="--c:#BB1E64"></div>
+                    <div class="color-box chroma-swatch" style="--c:#aaaaaa"></div>
+                    <div class="color-box chroma-swatch" style="--c:#365DDA"></div>
+                    <div class="color-box chroma-swatch" style="--c:#F96D31"></div>
+                    <div class="color-box chroma-swatch" style="--c:#FFFE71"></div>
+                    <div class="color-box chroma-swatch" style="--c:#B83C26"></div>
+                    <div class="color-box chroma-swatch" style="--c:#C5C6D3"></div>
+                    <div class="color-box chroma-swatch" style="--c:#94FAAC"></div>
+                    <div class="color-box chroma-swatch" style="--c:#964B00"></div>
+                    <div class="color-box chroma-swatch" style="--c:#000080"></div>
+                    <div class="color-box chroma-swatch" style="--c:#FF69B4"></div>
+                    <div class="color-box chroma-swatch" style="--c:#FFD580"></div>
+                    <div class="color-box chroma-swatch" style="--c:#601EF9"></div>
+                    <div class="color-box chroma-swatch" style="--c:#30D5C8"></div>
+                    <div class="color-box chroma-swatch" style="--c:#9999FF"></div>
+                    <div class="color-box chroma-swatch" style="--c:#4C4CFF"></div>
+                    <div class="color-box chroma-swatch" style="--c:#004C00"></div>
+                </div>
+                <button class="purchase-btn">Purchase</button>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- LINKS INFO MODAL -->
+<div id="linksInfoModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;" onclick="if(event.target===this)closeLinksInfo()">
+    <div style="background:#111;border:1px solid #282828;padding:28px 24px;max-width:340px;width:90%;text-align:center;position:relative;">
+        <button onclick="closeLinksInfo()" style="position:absolute;top:10px;right:14px;background:none;border:none;color:#666;font-size:22px;cursor:pointer;line-height:1;">×</button>
+        <h2 style="font-size:16px;font-weight:600;color:#fff;margin-bottom:10px;">Rich — Link Limits</h2>
+        <p style="font-size:13px;color:#aaa;line-height:1.7;margin:0;">All links are allowed in chat <strong style="color:#fff;">except</strong> Discord invite links (<code style="color:#ff8888;">discord.gg/</code>) and Telegram invite links (<code style="color:#ff8888;">t.me/</code>). Attempting to send these will block the message.</p>
+    </div>
+</div>
+
+<!-- PURCHASE MODAL -->
+<div class="buy-modal" id="buyModal" onclick="if(event.target===this)closeBuyModal()">
+    <div class="buy-modal-box">
+        <button class="buy-modal-close" onclick="closeBuyModal()">×</button>
+        <div class="buy-modal-title">Purchase <span id="modalRankName"></span></div>
+        <div class="buy-modal-sub">Choose one way to contact support to buy</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="https://discord.gg/feTqVTrqAk" target="_blank" class="buy-modal-discord">
+                <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;flex-shrink:0;">
+                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.03.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 13.93 13.93 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.175 13.175 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                </svg>
+                Discord
+            </a>
+            <a href="https://t.me/xd9_aep" target="_blank" class="buy-modal-discord" style="background:#229ED9;">
+                <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;flex-shrink:0;">
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 13.67l-2.965-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.963.889z"/>
+                </svg>
+                Telegram
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="showbin.js"></script>
+<script>
+    document.querySelector('.navbar-toggler').addEventListener('click', function() {
+        document.querySelector('.nav-wrapper').classList.toggle('show');
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.online-count').forEach(count => {
+            count.textContent = '42'; count.classList.add('connected'); count.style.display = 'flex';
+        });
+    });
+
+    function openLinksInfo(e) { e.preventDefault(); document.getElementById('linksInfoModal').style.display='flex'; }
+    function closeLinksInfo() { document.getElementById('linksInfoModal').style.display='none'; }
+
+    // Purchase modal
+    function openBuyModal(rankName) {
+        document.getElementById('modalRankName').textContent = rankName;
+        document.getElementById('buyModal').classList.add('show');
+    }
+    function closeBuyModal() {
+        document.getElementById('buyModal').classList.remove('show');
+    }
+    document.querySelectorAll('.purchase-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const name = this.closest('.upgrade-card').querySelector('.upgrade-name').textContent.trim();
+            openBuyModal(name);
+        });
+    });
+
+    // ── SPARKLE ENGINE ──
+    function initSparkle(canvas) {
+        const colors = canvas.dataset.colors.split(',');
+        function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+        resize();
+        window.addEventListener('resize', resize);
+        const ctx = canvas.getContext('2d');
+        const particles = [];
+
+        function spawn() {
+            const type = Math.random() > 0.5 ? 'star' : 'dot';
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: canvas.height * 0.4 + Math.random() * canvas.height * 0.6,
+                vx: (Math.random() - 0.5) * 0.6,
+                vy: -(0.3 + Math.random() * 0.9),
+                life: 0,
+                maxLife: 50 + Math.random() * 70,
+                r: type === 'star' ? 2 + Math.random() * 2.5 : 1 + Math.random() * 1.8,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                type,
+            });
+        }
+
+        function drawStar(x, y, r, color, alpha) {
+            ctx.save(); ctx.globalAlpha = alpha; ctx.fillStyle = color;
+            ctx.shadowColor = color; ctx.shadowBlur = 7;
+            ctx.beginPath();
+            for (let i = 0; i < 8; i++) {
+                const a = i * Math.PI / 4, rad = i % 2 === 0 ? r : r * 0.4;
+                i === 0 ? ctx.moveTo(x + Math.cos(a)*rad, y + Math.sin(a)*rad)
+                        : ctx.lineTo(x + Math.cos(a)*rad, y + Math.sin(a)*rad);
+            }
+            ctx.closePath(); ctx.fill(); ctx.restore();
+        }
+
+        function drawDot(x, y, r, color, alpha) {
+            ctx.save(); ctx.globalAlpha = alpha; ctx.fillStyle = color;
+            ctx.shadowColor = color; ctx.shadowBlur = 9;
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+        }
+
+        let frame = 0;
+        (function tick() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (++frame % 8 === 0 && particles.length < 22) spawn();
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.life++; p.x += p.vx; p.y += p.vy;
+                const prog = p.life / p.maxLife;
+                const alpha = prog < 0.15 ? prog / 0.15 : prog > 0.75 ? 1 - (prog - 0.75) / 0.25 : 1;
+                p.type === 'star' ? drawStar(p.x, p.y, p.r, p.color, alpha * 0.9)
+                                  : drawDot(p.x, p.y, p.r, p.color, alpha * 0.85);
+                if (p.life >= p.maxLife) particles.splice(i, 1);
+            }
+            requestAnimationFrame(tick);
+        })();
+
+        for (let i = 0; i < 6; i++) { spawn(); particles[particles.length-1].life = Math.floor(Math.random()*30); }
+    }
+
+    document.querySelectorAll('.sparkle-canvas').forEach(c => requestAnimationFrame(() => initSparkle(c)));
+
+    // ── INTERACTIVE COLOR PREVIEW ──
+    // Each color card: clicking a swatch updates the preview text in that card
+    document.querySelectorAll('.upgrade-card').forEach(card => {
+        const boxes = card.querySelectorAll('.color-box');
+        if (!boxes.length) return;
+
+        // Find or create preview line in this card
+        // We'll add a preview label under the perks list
+        const previewRow = document.createElement('div');
+        previewRow.className = 'perk-item color-preview-row';
+        previewRow.style.cssText = 'margin-top:8px;border-top:1px solid #222;padding-top:8px;';
+        previewRow.innerHTML = `<span style="color:#888;font-size:0.75rem;">Preview</span><span class="color-preview-name" style="font-size:0.8rem;font-weight:bold;">Anonymous</span>`;
+        card.querySelector('.perks-list').after(previewRow);
+
+        const previewName = previewRow.querySelector('.color-preview-name');
+        const isChroma = card.querySelector('.chroma-swatch') !== null;
+
+        boxes.forEach(box => {
+            box.style.cursor = 'pointer';
+            box.style.transition = 'transform 0.1s, outline 0.1s';
+
+            box.addEventListener('click', function() {
+                // Remove selected outline from siblings
+                boxes.forEach(b => b.style.outline = 'none');
+                this.style.outline = '2px solid #fff';
+                this.style.transform = 'scale(1.2)';
+                setTimeout(() => this.style.transform = 'scale(1)', 150);
+
+                const color = this.style.getPropertyValue('--c') || this.style.background;
+
+                if (isChroma) {
+                    // Animate gradient chroma → white → chroma
+                    previewName.style.cssText = `
+                        font-size:0.8rem; font-weight:bold;
+                        background: linear-gradient(90deg, ${color}, #ffffff, ${color}, #ffffff, ${color});
+                        background-size: 300% 300%;
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
+                        animation: chroma-sw 2s ease infinite;
+                    `;
+                } else {
+                    // Plain solid color
+                    previewName.style.cssText = `font-size:0.8rem; font-weight:bold; color:${color}; -webkit-text-fill-color:${color};`;
+                }
+            });
+
+            box.addEventListener('mouseenter', function() { this.style.transform = 'scale(1.15)'; });
+            box.addEventListener('mouseleave', function() { this.style.transform = 'scale(1)'; });
+        });
+    });
+
+    // Title sparkles — smaller, denser, stay near the text
+    document.querySelectorAll('.title-sparkle').forEach(canvas => {
+        const colors = canvas.dataset.colors.split(',');
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+        const pts = [];
+        function spawnT() {
+            pts.push({
+                x: Math.random() * W, y: H * 0.6 + Math.random() * H * 0.4,
+                vx: (Math.random()-.5)*.4, vy: -(0.2+Math.random()*.5),
+                life:0, maxLife: 30+Math.random()*40,
+                r: 0.8+Math.random()*1.4,
+                color: colors[Math.floor(Math.random()*colors.length)],
+                type: Math.random()>.5?'star':'dot'
+            });
+        }
+        let tf=0;
+        (function tick(){
+            ctx.clearRect(0,0,W,H);
+            if(++tf%6===0 && pts.length<10) spawnT();
+            for(let i=pts.length-1;i>=0;i--){
+                const p=pts[i]; p.life++; p.x+=p.vx; p.y+=p.vy;
+                const prog=p.life/p.maxLife;
+                const a=prog<.2?prog/.2:prog>.7?1-(prog-.7)/.3:1;
+                ctx.save(); ctx.globalAlpha=a*0.85; ctx.fillStyle=p.color;
+                ctx.shadowColor=p.color; ctx.shadowBlur=5;
+                if(p.type==='star'){
+                    ctx.beginPath();
+                    for(let k=0;k<8;k++){const ang=k*Math.PI/4,rad=k%2===0?p.r:p.r*.4;k===0?ctx.moveTo(p.x+Math.cos(ang)*rad,p.y+Math.sin(ang)*rad):ctx.lineTo(p.x+Math.cos(ang)*rad,p.y+Math.sin(ang)*rad);}
+                    ctx.closePath(); ctx.fill();
+                } else {
+                    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+                }
+                ctx.restore();
+                if(p.life>=p.maxLife) pts.splice(i,1);
+            }
+            requestAnimationFrame(tick);
+        })();
+    });
+</script>
+<!-- CONTACT MODAL -->
+<div id="contactModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;" onclick="if(event.target===this)closeContact()">
+    <div style="background:#111;border:1px solid #282828;padding:32px 28px;max-width:360px;width:90%;text-align:center;position:relative;">
+        <button onclick="closeContact()" style="position:absolute;top:10px;right:14px;background:none;border:none;color:#666;font-size:22px;cursor:pointer;line-height:1;">×</button>
+        <h2 style="font-size:17px;font-weight:600;color:#fff;margin-bottom:8px;">Contact Support</h2>
+        <p style="font-size:13px;color:#888;margin-bottom:22px;line-height:1.6;">Reach us on Discord or Telegram for support, inquiries, or reports.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="https://discord.gg/feTqVTrqAk" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;gap:9px;background:#5865F2;color:#fff;padding:11px 22px;text-decoration:none;font-size:13.5px;font-weight:600;" onmouseover="this.style.background='#4752c4'" onmouseout="this.style.background='#5865F2'"><svg viewBox="0 0 24 24" fill="white" style="width:18px;height:18px;flex-shrink:0;"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.03.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 13.93 13.93 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.175 13.175 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>Discord</a>
+            <a href="https://t.me/xd9_aep" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;gap:9px;background:#229ED9;color:#fff;padding:11px 22px;text-decoration:none;font-size:13.5px;font-weight:600;" onmouseover="this.style.background='#1a8abf'" onmouseout="this.style.background='#229ED9'"><svg viewBox="0 0 24 24" fill="white" style="width:18px;height:18px;flex-shrink:0;"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 13.67l-2.965-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.963.889z"/></svg>Telegram</a>
+        </div>
+    </div>
+</div>
+<script>function openContact(e){e.preventDefault();document.getElementById("contactModal").style.display="flex";}
+    function closeContact(){document.getElementById("contactModal").style.display="none";}</script>
+</body></html>

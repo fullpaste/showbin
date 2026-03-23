@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+    <title>Profile | Showbin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="all.min.css">
+    <link rel="stylesheet" href="nav.css">
+    <style>
+        input,*:focus{outline:none!important;box-shadow:none!important}
+        ::-webkit-scrollbar{display:none}
+        html{-ms-overflow-style:none;scrollbar-width:none}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:13.5px;}
+        @keyframes chromaAnim{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+        .profile-wrap{max-width:800px;margin:0 auto;padding:30px 20px;}
+
+        /* ── BANNER + HEADER combined block ── */
+        .profile-top{background:#0e0e0e;border:1px solid #1c1c1c;margin-bottom:10px;}
+        .profile-banner{width:100%;height:120px;overflow:hidden;background:#0a0a0a;}
+        .profile-banner img{width:100%;height:100%;object-fit:cover;}
+
+        .profile-header{
+            padding:0 20px 16px;
+            display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;
+        }
+        .profile-header-left{display:flex;align-items:flex-end;gap:14px;}
+
+        .profile-avatar{
+            width:72px;height:72px;
+            border:2px solid #282828;background:#181818;
+            flex-shrink:0;margin-top:-36px;
+            display:flex;align-items:center;justify-content:center;
+            color:#444;font-size:26px;font-weight:600;overflow:hidden;
+        }
+        .profile-avatar img{width:100%;height:100%;object-fit:cover;}
+
+        .profile-name-block{padding-bottom:2px;}
+        .profile-username{font-size:18px;font-weight:600;color:#fff;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+        .profile-bio{font-size:12.5px;color:#888;margin-top:4px;}
+        .profile-follow-counts{font-size:12.5px;color:#aaa;margin-top:5px;display:flex;gap:16px;}
+        .profile-follow-counts strong{color:#fff;}
+
+        .profile-follow-btn{
+            background:#282828;border:1px solid #383838;color:#fff;
+            padding:7px 18px;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;
+            align-self:center;white-space:nowrap;margin-bottom:2px;transition:background .15s;
+        }
+        .profile-follow-btn:hover{background:#333;}
+        .profile-follow-btn.following{background:#1a1a1a;color:#666;border-color:#282828;}
+
+        /* ── INFO ── */
+        .info-card{background:#0e0e0e;border:1px solid #1c1c1c;margin-bottom:10px;}
+        .card-header{padding:10px 14px;border-bottom:1px solid #1c1c1c;font-size:10.5px;color:#555;text-transform:uppercase;letter-spacing:.6px;font-weight:600;}
+        .info-row{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:1px solid #111;font-size:13px;}
+        .info-row:last-child{border-bottom:none;}
+        .info-label{color:#555;}
+        .info-val{color:#aaa;}
+        .warn-badge{background:#4a1a00;color:#ff8844;font-size:11px;padding:2px 7px;}
+
+        /* ── PASTES ── */
+        .pastes-card{background:#0e0e0e;border:1px solid #1c1c1c;margin-bottom:10px;}
+        .pastes-table{width:100%;border-collapse:collapse;font-size:13px;}
+        .pastes-table th{
+            padding:9px 14px;text-align:left;border-bottom:1px solid #1c1c1c;
+            color:#555;font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:600;
+        }
+        .pastes-table th:not(:first-child){text-align:center;}
+        .pastes-table td{padding:9px 14px;border-bottom:1px solid #111;color:#aaa;}
+        .pastes-table td:not(:first-child){text-align:center;color:#666;}
+        .pastes-table tr:last-child td{border-bottom:none;}
+        .pastes-table tr:nth-child(even){background:#0a0a0a;}
+        .pastes-table a{color:#fff;text-decoration:none;}
+        .pastes-table a:hover{text-decoration:underline;}
+
+        .pastes-footer{
+            padding:9px 14px;font-size:12.5px;color:#444;
+            display:flex;justify-content:space-between;align-items:center;
+            border-top:1px solid #111;
+        }
+        .footer-btn{
+            background:#282828;border:1px solid #383838;color:#fff;
+            padding:5px 14px;cursor:pointer;font-size:12.5px;
+            font-family:'Inter',sans-serif;transition:background .15s;
+        }
+        .footer-btn:hover{background:#333;}
+
+        .no-content{padding:20px 14px;color:#333;font-size:13px;text-align:center;}
+
+        /* ── COMMENTS ── */
+        .comments-card{background:#0e0e0e;border:1px solid #1c1c1c;margin-bottom:10px;}
+        .comments-card-header{
+            padding:10px 14px;border-bottom:1px solid #1c1c1c;
+            display:flex;justify-content:space-between;align-items:center;
+            font-size:10.5px;color:#555;text-transform:uppercase;letter-spacing:.5px;font-weight:600;
+        }
+        .comments-card-header .right{display:flex;align-items:center;gap:10px;}
+        .comments-card-header .cnt{color:#777;font-size:12px;font-weight:400;text-transform:none;letter-spacing:0;}
+        .comments-add-btn{
+            background:#282828;border:1px solid #383838;color:#fff;
+            padding:4px 13px;cursor:pointer;font-size:12px;
+            font-family:'Inter',sans-serif;transition:background .15s;
+        }
+        .comments-add-btn:hover{background:#333;}
+
+        .comment-item{padding:11px 14px;border-bottom:1px solid #111;}
+        .comment-item:last-child{border-bottom:none;}
+        .comment-meta{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+        .comment-author{font-size:13px;font-weight:600;color:#fff;}
+        .comment-date{font-size:11px;color:#333;margin-left:auto;}
+        .comment-del{font-size:11px;color:#222;cursor:pointer;margin-left:6px;}
+        .comment-del:hover{color:#ff4444;}
+        .comment-text{font-size:13px;color:#888;line-height:1.6;word-break:break-word;}
+
+        .comment-input-wrap{padding:12px 14px;border-top:1px solid #1c1c1c;}
+        .comment-input-wrap textarea{
+            width:100%;background:#181818;border:1px solid #282828;color:#fff;
+            padding:9px 10px;font-size:13px;resize:none;min-height:60px;
+            font-family:'Inter',sans-serif;box-sizing:border-box;
+        }
+        .comment-input-wrap textarea:focus{border-color:#383838;}
+        .comment-input-wrap textarea::placeholder{color:#444;}
+        .comment-submit{
+            margin-top:8px;background:#282828;border:1px solid #383838;color:#fff;
+            padding:7px 18px;cursor:pointer;font-size:13px;
+            font-family:'Inter',sans-serif;transition:background .15s;
+        }
+        .comment-submit:hover{background:#333;}
+        .login-prompt{padding:10px 14px;font-size:12.5px;color:#444;border-top:1px solid #1c1c1c;}
+        .login-prompt a{color:#666;text-decoration:underline;}
+
+        #notFound{display:none;text-align:center;padding:80px 20px;color:#444;font-size:15px;}
+
+        @media(max-width:600px){
+            .profile-banner{height:80px;}
+            .profile-avatar{width:56px;height:56px;font-size:20px;margin-top:-28px;}
+            .pastes-table th:nth-child(2),.pastes-table td:nth-child(2){display:none;}
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <div class="container">
+        <div class="nav-brand"><a href="index.html">Showbin</a></div>
+        <button class="navbar-toggler" type="button">☰</button>
+        <div class="nav-wrapper">
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="add.html">Add Paste</a></li>
+                <li><a href="users.html">Users</a></li>
+                <li><a href="upgrades.html">Upgrades</a></li>
+                <li><a href="hof.html">Hall of Shame</a></li>
+                <li><a href="#" onclick="openContact(event)">Contact</a></li>
+            </ul>
+            <style>
+                .online-count{display:flex;align-items:center;color:#00ff00;font-size:12px;}
+                .online-count::before{content:'';display:inline-block;width:6px;height:6px;background:#00ff00;border-radius:50%;margin-right:6px;animation:pulse 2s infinite;box-shadow:0 0 0 0 rgba(0,255,0,.7);}
+                @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,255,0,.7)}70%{box-shadow:0 0 0 6px rgba(0,255,0,0)}100%{box-shadow:0 0 0 0 rgba(0,255,0,0)}}
+            </style>
+            <div class="online-count desktop-only" style="display:none;">0</div>
+            <div class="nav-auth" id="navAuth">
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html">Register</a></li>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div id="contactModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;" onclick="if(event.target===this)closeContact()">
+    <div style="background:#111;border:1px solid #282828;padding:32px 28px;max-width:360px;width:90%;text-align:center;position:relative;">
+        <button onclick="closeContact()" style="position:absolute;top:10px;right:14px;background:none;border:none;color:#666;font-size:22px;cursor:pointer;">×</button>
+        <h2 style="font-size:17px;font-weight:600;color:#fff;margin-bottom:8px;">Contact Support</h2>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;">
+            <a href="https://discord.gg/feTqVTrqAk" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;gap:9px;background:#5865F2;color:#fff;padding:11px 22px;text-decoration:none;font-size:13.5px;font-weight:600;">Discord</a>
+            <a href="https://t.me/xd9_aep" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;gap:9px;background:#229ED9;color:#fff;padding:11px 22px;text-decoration:none;font-size:13.5px;font-weight:600;">Telegram</a>
+        </div>
+    </div>
+</div>
+
+<div class="profile-wrap" id="profileWrap" style="display:none;">
+
+    <!-- Banner + Header -->
+    <div class="profile-top">
+        <div class="profile-banner" id="bannerBox"></div>
+        <div class="profile-header">
+            <div class="profile-header-left">
+                <div class="profile-avatar" id="avatarEl"></div>
+                <div class="profile-name-block">
+                    <div class="profile-username">
+                        <span id="profileUsername"></span>
+                        <span id="profileRankTag"></span>
+                    </div>
+                    <div class="profile-bio" id="profileBio" style="display:none;"></div>
+                    <div class="profile-follow-counts" id="profileFollowCounts" style="display:none;">
+                        <span><strong id="fcFollowing">0</strong> Following</span>
+                        <span><strong id="fcFollowers">0</strong> Followers</span>
+                    </div>
+                </div>
+            </div>
+            <button class="profile-follow-btn" id="followBtn" style="display:none;" onclick="toggleFollow()">Follow</button>
+        </div>
+    </div>
+
+    <!-- Info -->
+    <div class="info-card">
+        <div class="card-header">Info</div>
+        <div class="info-row"><span class="info-label">UID</span><span class="info-val" id="infoUid"></span></div>
+        <div class="info-row"><span class="info-label">Pastes</span><span class="info-val" id="infoPastes"></span></div>
+        <div class="info-row"><span class="info-label">Likes</span><span class="info-val" id="infoLikes"></span></div>
+        <div class="info-row"><span class="info-label">Created</span><span class="info-val" id="infoCreated"></span></div>
+        <div class="info-row" id="infoWarnRow" style="display:none;"><span class="info-label">Warnings</span><span class="info-val"><span class="warn-badge" id="infoWarns">0</span></span></div>
+        <div class="info-row"><span class="info-label">Rank</span><span class="info-val" id="infoRank"></span></div>
+    </div>
+
+    <!-- Pastes -->
+    <div class="pastes-card">
+        <div class="card-header">Pastes</div>
+        <table class="pastes-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Comments</th>
+                    <th>Views</th>
+                    <th>Added</th>
+                </tr>
+            </thead>
+            <tbody id="pastesTbody"></tbody>
+        </table>
+        <div class="pastes-footer" id="pastesFooter" style="display:none;">
+            <span id="pastesShowing"></span>
+            <button class="footer-btn" id="pastesNextBtn" style="display:none;" onclick="pastePageNext()">Next</button>
+        </div>
+    </div>
+
+    <!-- Comments -->
+    <div class="comments-card">
+        <div class="comments-card-header">
+            <span>Comments</span>
+            <div class="right">
+                <span class="cnt" id="commentCount">0</span>
+                <button class="comments-add-btn" id="commentsAddBtn" style="display:none;" onclick="focusInput()">Add</button>
+            </div>
+        </div>
+        <div id="commentsList"></div>
+        <div id="commentsInput"></div>
+    </div>
+</div>
+
+<div id="notFound">
+    <div style="color:#555;margin-bottom:8px;">User not found</div>
+    <a href="users.html" style="color:#444;font-size:13px;text-decoration:underline;">← Back to Users</a>
+</div>
+
+<script src="showbin.js"></script>
+<script>
+    function openContact(e){e.preventDefault();document.getElementById('contactModal').style.display='flex';}
+    function closeContact(){document.getElementById('contactModal').style.display='none';}
+    document.querySelector('.navbar-toggler').addEventListener('click',()=>document.querySelector('.nav-wrapper').classList.toggle('show'));
+
+    const RANK_CSS={
+        harmful:'background:linear-gradient(90deg,#ff4444,#ffaaaa,#fff,#ff4444);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:chromaAnim 4s ease infinite;font-weight:700;',
+        rich:'background:linear-gradient(90deg,#00cc44,#aaffaa,#fff,#00cc44);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:chromaAnim 4s ease infinite;font-weight:700;',
+        boss:'background:linear-gradient(90deg,#fff,#aaa,#333,#fff);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:chromaAnim 4s ease infinite;font-weight:700;',
+    };
+    const RANK_LABEL={harmful:'Harmful',rich:'Rich',boss:'Boss'};
+
+    function rankTagHTML(u){
+        if(u.adminRankName) return `<span style="${u.adminRankStyle||'color:#fff;font-weight:600;'}">[${escHtml(u.adminRankName)}]</span>`;
+        if(u.rank&&RANK_CSS[u.rank]) return `<span style="${RANK_CSS[u.rank]}">[${RANK_LABEL[u.rank]}]</span>`;
+        return '';
+    }
+
+    let _un='', _pastes=[], _page=0;
+    const PER_PAGE=5;
+
+    function getPasteComments(id){
+        try{return JSON.parse(localStorage.getItem('sb_comments_'+id)||'[]');}catch{return [];}
+    }
+
+    function renderPastes(){
+        const tbody=document.getElementById('pastesTbody');
+        const footer=document.getElementById('pastesFooter');
+        const showing=document.getElementById('pastesShowing');
+        const nextBtn=document.getElementById('pastesNextBtn');
+        const total=_pastes.length;
+
+        if(!total){
+            tbody.innerHTML=`<tr><td colspan="4" class="no-content">No pastes yet.</td></tr>`;
+            footer.style.display='none';
+            return;
+        }
+
+        const visible=_pastes.slice(0,(_page+1)*PER_PAGE);
+        tbody.innerHTML=visible.map(p=>{
+            const cmts=getPasteComments(p.id).length;
+            return `<tr>
+                <td><a href="paste.html?id=${escHtml(p.id)}">${escHtml(p.title||'Untitled')}</a></td>
+                <td>${cmts}</td>
+                <td>${p.views||0}</td>
+                <td>${p.created_at||''}</td>
+            </tr>`;
+        }).join('');
+
+        footer.style.display='flex';
+        showing.textContent=`Showing ${visible.length} out of ${total} paste${total!==1?'s':''}`;
+        nextBtn.style.display=visible.length<total?'inline-block':'none';
+    }
+
+    function pastePageNext(){_page++;renderPastes();}
+
+    function getProfileComments(un){
+        try{return JSON.parse(localStorage.getItem('sb_pcomments_'+un)||'[]');}catch{return [];}
+    }
+    function saveProfileComments(un,arr){localStorage.setItem('sb_pcomments_'+un,JSON.stringify(arr));}
+
+    function focusInput(){
+        const t=document.getElementById('pcomment-input');
+        if(t){t.focus();t.scrollIntoView({behavior:'smooth',block:'center'});}
+    }
+
+    function renderComments(un){
+        const comments=getProfileComments(un);
+        const users=JSON.parse(localStorage.getItem('sb_users')||'{}');
+        let cur=null;try{cur=JSON.parse(localStorage.getItem('sb_user'));}catch{}
+        const isAdmin=cur&&users[cur.username.toLowerCase()]?.isAdmin;
+
+        document.getElementById('commentCount').textContent=comments.length;
+        if(cur) document.getElementById('commentsAddBtn').style.display='inline-block';
+
+        const listEl=document.getElementById('commentsList');
+        if(!comments.length){
+            listEl.innerHTML=`<div class="no-content">No comments yet.</div>`;
+        } else {
+            listEl.innerHTML=comments.slice().reverse().map((c,ri)=>{
+                const i=comments.length-1-ri;
+                const cu2=c.author?users[c.author.toLowerCase()]:null;
+                const tag=cu2?rankTagHTML(cu2):'';
+                const canDel=cur&&(cur.username.toLowerCase()===c.author?.toLowerCase()||isAdmin);
+                return `<div class="comment-item">
+                    <div class="comment-meta">
+                        <span class="comment-author">${escHtml(c.author||'Anonymous')}</span>
+                        ${tag?`<span style="font-size:10.5px">${tag}</span>`:''}
+                        <span class="comment-date">${c.date||''}</span>
+                        ${canDel?`<span class="comment-del" onclick="delComment(${i},'${un}')">✕</span>`:''}
+                    </div>
+                    <div class="comment-text">${escHtml(c.text)}</div>
+                </div>`;
+            }).join('');
+        }
+
+        const inputEl=document.getElementById('commentsInput');
+        if(cur){
+            inputEl.innerHTML=`<div class="comment-input-wrap">
+                <textarea id="pcomment-input" placeholder="Write a comment..." maxlength="500"></textarea>
+                <button class="comment-submit" onclick="submitComment('${un}')">Post Comment</button>
+            </div>`;
+        } else {
+            inputEl.innerHTML=`<div class="login-prompt"><a href="login.html">Login</a> to leave a comment.</div>`;
+        }
+    }
+
+    function submitComment(un){
+        const t=document.getElementById('pcomment-input');
+        const text=t.value.trim();
+        if(!text) return;
+        let cur=null;try{cur=JSON.parse(localStorage.getItem('sb_user'));}catch{}
+        const now=new Date();
+        const date=`${now.toLocaleDateString()} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+        const comments=getProfileComments(un);
+        comments.push({author:cur?cur.username:null,text,date});
+        saveProfileComments(un,comments);
+        t.value='';
+        renderComments(un);
+    }
+
+    function delComment(index,un){
+        const comments=getProfileComments(un);
+        comments.splice(index,1);
+        saveProfileComments(un,comments);
+        renderComments(un);
+    }
+
+    function toggleFollow(){
+        let cur=null;try{cur=JSON.parse(localStorage.getItem('sb_user'));}catch{}
+        if(!cur) return location.href='login.html';
+        const users=JSON.parse(localStorage.getItem('sb_users')||'{}');
+        const cu=users[cur.username.toLowerCase()];
+        if(!cu) return;
+        const btn=document.getElementById('followBtn');
+        const following=cu.following||[];
+        const idx=following.indexOf(_un);
+        if(idx===-1){following.push(_un);btn.textContent='Following';btn.classList.add('following');}
+        else{following.splice(idx,1);btn.textContent='Follow';btn.classList.remove('following');}
+        cu.following=following;
+        users[cur.username.toLowerCase()]=cu;
+        localStorage.setItem('sb_users',JSON.stringify(users));
+    }
+
+    function loadProfile(){
+        const params=new URLSearchParams(location.search);
+        const un=(params.get('u')||'').trim();
+        if(!un){document.getElementById('notFound').style.display='block';return;}
+        _un=un.toLowerCase();
+
+        const users=JSON.parse(localStorage.getItem('sb_users')||'{}');
+        const u=users[_un];
+        if(!u){document.getElementById('notFound').style.display='block';return;}
+
+        document.title=u.username+' | Showbin';
+        document.getElementById('profileWrap').style.display='block';
+
+        const uid=Object.keys(users).indexOf(_un)+1;
+        _pastes=getPastes().filter(p=>p.author&&p.author.toLowerCase()===_un);
+        const warns=(u.warnings||[]).length;
+        const likes=u.likes||0;
+
+        // Banner
+        const bannerBox=document.getElementById('bannerBox');
+        if(u.banner){bannerBox.innerHTML=`<img src="${u.banner}" onerror="this.parentElement.innerHTML=''">`;
+        } else {bannerBox.style.background='#0a0a0a';}
+
+        // Avatar
+        const avEl=document.getElementById('avatarEl');
+        if(u.pfp){avEl.innerHTML=`<img src="${u.pfp}" onerror="this.parentElement.textContent='${u.username[0].toUpperCase()}'">`;}
+        else{avEl.textContent=u.username[0].toUpperCase();}
+
+        // Username + rank
+        document.getElementById('profileUsername').textContent=u.username;
+        document.getElementById('profileRankTag').innerHTML=rankTagHTML(u);
+
+        // Bio
+        if(u.bio){const b=document.getElementById('profileBio');b.textContent=u.bio;b.style.display='block';}
+
+        // Following/followers
+        const following=(u.following||[]).length;
+        const followers=(u.followers||[]).length;
+        if(following>0||followers>0){
+            document.getElementById('profileFollowCounts').style.display='flex';
+            document.getElementById('fcFollowing').textContent=following;
+            document.getElementById('fcFollowers').textContent=followers;
+        }
+
+        // Follow button
+        let cur=null;try{cur=JSON.parse(localStorage.getItem('sb_user'));}catch{}
+        if(cur&&cur.username.toLowerCase()!==_un){
+            const btn=document.getElementById('followBtn');btn.style.display='inline-block';
+            const cu=users[cur.username.toLowerCase()];
+            const isFollowing=cu&&(cu.following||[]).includes(_un);
+            if(isFollowing){btn.textContent='Following';btn.classList.add('following');}
+        }
+
+        // Info
+        document.getElementById('infoUid').textContent=uid;
+        document.getElementById('infoPastes').textContent=_pastes.length;
+        document.getElementById('infoLikes').textContent=likes;
+        document.getElementById('infoCreated').textContent=u.joined||'Unknown';
+
+        const rankEl=document.getElementById('infoRank');
+        if(u.adminRankName){rankEl.innerHTML=`<span style="${u.adminRankStyle||'color:#fff;font-weight:600;'}">${escHtml(u.adminRankName)}</span>`;}
+        else if(u.rank&&RANK_CSS[u.rank]){rankEl.innerHTML=`<span style="${RANK_CSS[u.rank]}">${RANK_LABEL[u.rank]}</span>`;}
+        else{rankEl.textContent='None';}
+
+        // Warnings (admin only)
+        try{
+            if(cur){const cu=users[cur.username.toLowerCase()];if(cu&&cu.isAdmin&&warns>0){document.getElementById('infoWarnRow').style.display='flex';document.getElementById('infoWarns').textContent=warns;}}
+        }catch{}
+
+        // Nav
+        if(cur){
+            document.getElementById('navAuth').innerHTML=`<li><a href="profile.html?u=${encodeURIComponent(cur.username)}" style="color:#fff;font-weight:600;">${escHtml(cur.username)}</a></li><li><a href="#" onclick="localStorage.removeItem('sb_user');location.reload()">Logout</a></li>`;
+        }
+
+        renderPastes();
+        renderComments(_un);
+    }
+
+    loadProfile();
+</script>
+</body>
+</html>

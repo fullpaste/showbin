@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:,">
+<title>Admin | Showbin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#060606}::-webkit-scrollbar-thumb{background:#282828}
+body{background:#060606;color:#fff;font-family:'Inter',sans-serif;font-size:13.5px;min-height:100vh}
+input,textarea,select,button{font-family:'Inter',sans-serif;font-size:13px;outline:none}
+a{color:inherit;text-decoration:none}
+
+/* ── LOCK SCREEN ── */
+#lockScreen{position:fixed;inset:0;background:#060606;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+#lockScreen h2{font-size:15px;color:#555;font-weight:500;letter-spacing:1px;text-transform:uppercase}
+#lockInput{background:#111;border:1px solid #282828;color:#fff;padding:10px 14px;width:320px;font-size:13px}
+#lockInput::placeholder{color:#444}
+#lockBtn{background:#181818;border:1px solid #282828;color:#888;padding:9px 24px;cursor:pointer;width:320px;font-size:13px;transition:background .1s}
+#lockBtn:hover{background:#222;color:#fff}
+#lockErr{color:#ff4444;font-size:12px;height:16px}
+
+/* ── WELCOME ── */
+#welcomeScreen{position:fixed;inset:0;background:#060606;z-index:9998;display:none;align-items:center;justify-content:center;opacity:0;transition:opacity .6s}
+#welcomeScreen span{font-size:22px;font-weight:600;color:#fff;letter-spacing:2px}
+
+/* ── LAYOUT ── */
+#adminWrap{display:none;min-height:100vh;flex-direction:row}
+.sidebar{width:220px;min-width:220px;background:#0a0a0a;border-right:1px solid #1c1c1c;padding:20px 0;display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;overflow-y:auto}
+.sidebar-title{padding:14px 18px 18px;font-size:14px;font-weight:600;color:#fff;border-bottom:1px solid #1c1c1c;letter-spacing:.5px}
+.sidebar-title span{color:#ff4444;font-size:11px;font-weight:400;display:block;margin-top:2px}
+.nav-item{padding:9px 18px;color:#666;cursor:pointer;font-size:13px;transition:color .1s;display:flex;align-items:center;gap:8px;border-left:2px solid transparent}
+.nav-item:hover{color:#ccc;background:#111}
+.nav-item.active{color:#fff;border-left-color:#ff4444;background:#111}
+.nav-section{padding:10px 18px 4px;font-size:10.5px;color:#333;text-transform:uppercase;letter-spacing:1px;margin-top:8px}
+.main{margin-left:220px;padding:28px 32px;flex:1;min-height:100vh}
+.page-title{font-size:18px;font-weight:600;color:#fff;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid #1c1c1c}
+.section{display:none}
+.section.active{display:block}
+
+/* ── CARDS ── */
+.card{background:#0e0e0e;border:1px solid #1c1c1c;padding:18px 20px;margin-bottom:16px;max-width:520px}
+.card h3{font-size:13.5px;font-weight:600;color:#ccc;margin-bottom:12px}
+.input-row{display:flex;gap:8px;margin-bottom:8px}
+.inp{background:#181818;border:1px solid #282828;color:#fff;padding:8px 10px;flex:1;font-size:13px}
+.inp::placeholder{color:#444}
+.inp:focus{border-color:#383838}
+.select{background:#181818;border:1px solid #282828;color:#fff;padding:8px 10px;font-size:13px;cursor:pointer}
+.btn{background:#222;border:1px solid #303030;color:#aaa;padding:8px 16px;cursor:pointer;font-size:13px;white-space:nowrap;transition:background .1s}
+.btn:hover{background:#2a2a2a;color:#fff}
+.btn-red{border-color:#4a1a1a;color:#ff6666}
+.btn-red:hover{background:#2a1010;color:#ff8888}
+.btn-green{border-color:#1a3a1a;color:#66cc66}
+.btn-green:hover{background:#102010;color:#88ee88}
+.btn-gold{border-color:#3a2a00;color:#f5c518}
+.btn-gold:hover{background:#1a1500;color:#ffd700}
+.res{margin-top:10px;font-size:12.5px;color:#666;min-height:18px;line-height:1.6}
+.res.ok{color:#66cc66}
+.res.err{color:#ff6666}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:8888;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:#111;border:1px solid #282828;padding:26px 24px;max-width:420px;width:90%;position:relative;max-height:80vh;overflow-y:auto}
+.modal-box h3{font-size:15px;font-weight:600;color:#fff;margin-bottom:14px}
+.modal-close{position:absolute;top:10px;right:14px;background:none;border:none;color:#555;font-size:20px;cursor:pointer;line-height:1}
+.modal-close:hover{color:#fff}
+.info-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a1a;font-size:13px}
+.info-row:last-child{border-bottom:none}
+.info-label{color:#555}
+.info-val{color:#ccc;text-align:right;max-width:60%}
+
+/* ── HOF GRID ── */
+.hof-preview{background:#0e0e0e;border:1px solid #2a2a2a;padding:12px;margin-top:10px;max-width:320px}
+.hof-preview img{width:100%;max-height:160px;object-fit:cover;margin-bottom:8px;display:none}
+.hof-preview-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.hof-preview-desc{font-size:12px;color:#888;line-height:1.5}
+
+/* ── CHAT SECTION ── */
+.chat-user-list{max-height:200px;overflow-y:auto;border:1px solid #1c1c1c;background:#0a0a0a}
+.chat-user-item{padding:7px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #111;font-size:12.5px}
+.chat-user-item:hover{background:#111}
+.chat-user-item .cu-name{color:#ccc;cursor:pointer;text-decoration:underline}
+.chat-user-item .cu-actions{display:flex;gap:6px}
+
+/* ── FADE ── */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.fade-in{animation:fadeIn .4s ease forwards}
+@keyframes chromaAnim{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+/* ── TABS within security ── */
+.sec-tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid #1c1c1c}
+.sec-tab{padding:8px 16px;font-size:13px;color:#555;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.sec-tab:hover{color:#aaa}
+.sec-tab.active{color:#fff;border-bottom-color:#ff4444}
+.sec-page{display:none}.sec-page.active{display:block}
+
+/* ── WARNING badge ── */
+.warn-badge{background:#4a1a00;color:#ff8844;font-size:11px;padding:2px 7px;border-radius:2px;margin-left:6px}
+
+/* ── SUSPENDED notice ── */
+#suspendedScreen{display:none;position:fixed;inset:0;background:#060606;z-index:9990;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:20px}
+#suspendedScreen h2{font-size:20px;color:#ff4444;font-weight:600}
+#suspendedScreen p{color:#888;font-size:14px;line-height:1.8}
+#suspendedScreen a{color:#5865F2;text-decoration:underline}
+</style>
+</head>
+<body>
+
+<!-- SUSPENDED SCREEN -->
+<div id="suspendedScreen">
+  <h2>Account Suspended</h2>
+  <p id="suspendMsg">Your account has been suspended from Showbin.<br><span id="suspendTimer"></span></p>
+  <p>Appeal: <a href="https://discord.gg/feTqVTrqAk" target="_blank">Discord</a> &nbsp;|&nbsp; <a href="https://t.me/xd9_aep" target="_blank">Telegram</a></p>
+</div>
+
+<!-- LOCK SCREEN -->
+<div id="lockScreen">
+  <h2>Admin Access</h2>
+  <input id="lockInput" type="password" placeholder="Enter secret key">
+  <button id="lockBtn" onclick="checkKey()">Unlock</button>
+  <button onclick="history.back()" style="background:none;border:none;color:#444;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:-8px;">← Go Back</button>
+  <div id="lockErr"></div>
+</div>
+
+<!-- WELCOME -->
+<div id="welcomeScreen" style="display:none;align-items:center;justify-content:center;position:fixed;inset:0;background:#060606;z-index:9998;">
+  <span id="welcomeText" style="font-size:22px;font-weight:600;color:#fff;letter-spacing:2px;opacity:0;transition:opacity .7s">Welcome, CEO.</span>
+</div>
+
+<!-- ADMIN WRAP -->
+<div id="adminWrap" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-title">Showbin Admin<span>CEO Panel</span></div>
+    <div class="nav-section">Users</div>
+    <div class="nav-item active" onclick="showSection('gifting')">Gifting</div>
+    <div class="nav-item" onclick="showSection('revoke')">Revoke</div>
+    <div class="nav-item" onclick="showSection('actions')">Actions</div>
+    <div class="nav-item" onclick="showSection('monitor')">Monitor</div>
+    <div class="nav-item" onclick="showSection('security')">Security</div>
+    <div class="nav-item" onclick="showSection('profile')">Profile</div>
+    <div class="nav-item" onclick="showSection('warning')">Warning</div>
+    <div class="nav-section">Pastes</div>
+    <div class="nav-item" onclick="showSection('pastesec')">Paste Security</div>
+    <div class="nav-section">Community</div>
+    <div class="nav-item" onclick="showSection('hof')">Hall of Shame</div>
+    <div class="nav-item" onclick="showSection('mainpage')">Main Page</div>
+    <div class="nav-item" onclick="showSection('chatsettings')">Chat Settings</div>
+    <div class="nav-section">System</div>
+    <div class="nav-item" onclick="showSection('chatusers')">Chat Users</div>
+    <div class="nav-item" onclick="showSection('admins')">Admin Management</div>
+    <div class="nav-item" onclick="showSection('customization')">My Customization</div>
+    <div class="nav-item" onclick="showSection('adminlogin')">Login as User</div>
+    <div class="nav-item" onclick="showSection('recentvisitors')">Recent Visitors</div>
+    <div class="nav-item btn-red" onclick="adminLogout()" style="margin-top:auto;color:#ff6666;">Exit Admin</div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- GIFTING -->
+    <div id="sec-gifting" class="section active">
+      <div class="page-title">Gifting</div>
+      <div class="card">
+        <h3>Gift Rank to User</h3>
+        <div class="input-row">
+          <input class="inp" id="gift-user" placeholder="Username">
+          <select class="select" id="gift-rank">
+            <option value="harmful">Harmful</option>
+            <option value="rich">Rich</option>
+            <option value="boss">Boss</option>
+          </select>
+          <button class="btn btn-gold" onclick="doGift()">Gift</button>
+        </div>
+        <div class="res" id="gift-res"></div>
+      </div>
+    </div>
+
+    <!-- REVOKE -->
+    <div id="sec-revoke" class="section">
+      <div class="page-title">Revoke Rank</div>
+      <div class="card">
+        <h3>Remove Rank from User</h3>
+        <div class="input-row">
+          <input class="inp" id="revoke-user" placeholder="Username">
+          <button class="btn btn-red" onclick="doRevoke()">Revoke</button>
+        </div>
+        <div class="res" id="revoke-res"></div>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div id="sec-actions" class="section">
+      <div class="page-title">User Actions</div>
+      <div class="card">
+        <h3>Suspend User</h3>
+        <div class="input-row">
+          <input class="inp" id="suspend-user" placeholder="Username">
+          <input class="inp" id="suspend-dur" placeholder="Duration (e.g. 24h, 7d, permanent)">
+          <button class="btn btn-red" onclick="doSuspend()">Suspend</button>
+        </div>
+        <div class="res" id="suspend-res"></div>
+      </div>
+      <div class="card">
+        <h3>Unsuspend User</h3>
+        <div class="input-row">
+          <input class="inp" id="unsuspend-user" placeholder="Username">
+          <button class="btn btn-green" onclick="doUnsuspend()">Unsuspend</button>
+        </div>
+        <div class="res" id="unsuspend-res"></div>
+      </div>
+    </div>
+
+    <!-- MONITOR -->
+    <div id="sec-monitor" class="section">
+      <div class="page-title">Monitor</div>
+      <div class="card" style="max-width:600px;">
+        <h3>Recent Visitors</h3>
+        <div id="mon-visitors" style="font-size:12.5px;color:#555;">Loading...</div>
+      </div>
+      <div class="card">
+        <h3>Check User IP Info</h3>
+        <div class="input-row">
+          <input class="inp" id="mon-user" placeholder="Username">
+          <button class="btn" onclick="doMonitor()">Check</button>
+        </div>
+        <div id="mon-res" class="res"></div>
+        <div id="mon-data" style="margin-top:10px;display:none;">
+          <div class="info-row"><span class="info-label">Username</span><span class="info-val" id="mon-uname"></span></div>
+          <div class="info-row"><span class="info-label"><span id="mon-ipv4-label" style="cursor:pointer;text-decoration:underline;color:#2A9FD6" onclick="showIpDetail('ipv4')">IPv4</span></span><span class="info-val" id="mon-ipv4"></span></div>
+          <div class="info-row"><span class="info-label"><span id="mon-ipv6-label" style="cursor:pointer;text-decoration:underline;color:#2A9FD6" onclick="showIpDetail('ipv6')">IPv6</span></span><span class="info-val" id="mon-ipv6"></span></div>
+          <div class="info-row"><span class="info-label">Country</span><span class="info-val" id="mon-country"></span></div>
+          <div class="info-row"><span class="info-label">Last Login</span><span class="info-val" id="mon-ts"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECURITY -->
+    <div id="sec-security" class="section">
+      <div class="page-title">Security</div>
+      <div class="sec-tabs">
+        <div class="sec-tab active" onclick="showSecTab('blacklist')">Blacklist</div>
+        <div class="sec-tab" onclick="showSecTab('detection')">Detection</div>
+        <div class="sec-tab" onclick="showSecTab('logout')">Log Out</div>
+        <div class="sec-tab" onclick="showSecTab('password')">Password</div>
+        <div class="sec-tab" onclick="showSecTab('resetpass')">Reset Pass</div>
+        <div class="sec-tab" onclick="showSecTab('account')">Account</div>
+      </div>
+
+      <div id="sectab-blacklist" class="sec-page active">
+        <div class="card"><h3>Blacklist User + IP</h3>
+          <div class="input-row"><input class="inp" id="bl-user" placeholder="Username"><button class="btn btn-red" onclick="doBlacklist()">Blacklist</button></div>
+          <div class="res" id="bl-res"></div>
+        </div>
+      </div>
+      <div id="sectab-detection" class="sec-page">
+        <div class="card"><h3>Find Linked Accounts (same IP)</h3>
+          <div class="input-row"><input class="inp" id="det-user" placeholder="Username"><button class="btn" onclick="doDetect()">Detect</button></div>
+          <div class="res" id="det-res"></div>
+        </div>
+      </div>
+      <div id="sectab-logout" class="sec-page">
+        <div class="card"><h3>Log Out All Sessions</h3>
+          <div class="input-row"><input class="inp" id="lo-user" placeholder="Username"><button class="btn btn-red" onclick="doLogoutUser()">Log Out</button></div>
+          <div class="res" id="lo-res"></div>
+        </div>
+      </div>
+      <div id="sectab-password" class="sec-page">
+        <div class="card"><h3>View Account Password</h3>
+          <div class="input-row"><input class="inp" id="pw-user" placeholder="Username"><button class="btn" onclick="doViewPass()">View</button></div>
+          <div class="res" id="pw-res"></div>
+        </div>
+      </div>
+      <div id="sectab-resetpass" class="sec-page">
+        <div class="card"><h3>Generate Password Reset Link</h3>
+          <div class="input-row"><input class="inp" id="rp-user" placeholder="Username"><button class="btn btn-gold" onclick="doResetPass()">Generate Link</button></div>
+          <div class="res" id="rp-res" style="word-break:break-all;"></div>
+        </div>
+      </div>
+      <div id="sectab-account" class="sec-page">
+        <div class="card"><h3>View Account Information</h3>
+          <div class="input-row"><input class="inp" id="acc-user" placeholder="Username"><button class="btn" onclick="doViewAccount()">View</button></div>
+          <div class="res" id="acc-res"></div>
+          <div id="acc-data" style="margin-top:10px;display:none;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="sec-profile" class="section">
+      <div class="page-title">Profile Actions</div>
+      <div class="card"><h3>Clear Bio</h3>
+        <div class="input-row"><input class="inp" id="cbio-user" placeholder="Username"><button class="btn btn-red" onclick="doClearBio()">Clear</button></div>
+        <div class="res" id="cbio-res"></div>
+      </div>
+      <div class="card"><h3>Clear Profile Picture</h3>
+        <div class="input-row"><input class="inp" id="cpfp-user" placeholder="Username"><button class="btn btn-red" onclick="doClearPfp()">Clear</button></div>
+        <div class="res" id="cpfp-res"></div>
+      </div>
+      <div class="card"><h3>Clear Banner</h3>
+        <div class="input-row"><input class="inp" id="cban-user" placeholder="Username"><button class="btn btn-red" onclick="doClearBanner()">Clear</button></div>
+        <div class="res" id="cban-res"></div>
+      </div>
+    </div>
+
+    <!-- WARNING -->
+    <div id="sec-warning" class="section">
+      <div class="page-title">Send Warning</div>
+      <div class="card"><h3>Warn User</h3>
+        <div class="input-row"><input class="inp" id="warn-user" placeholder="Username"></div>
+        <div class="input-row"><input class="inp" id="warn-title" placeholder="Warning title"></div>
+        <div class="input-row"><textarea class="inp" id="warn-desc" placeholder="Description / reason" style="resize:vertical;min-height:70px;"></textarea></div>
+        <div class="input-row"><button class="btn btn-red" onclick="doWarn()">Send Warning</button></div>
+        <div class="res" id="warn-res"></div>
+      </div>
+      <div class="card"><h3>View Warnings for User</h3>
+        <div class="input-row"><input class="inp" id="warnview-user" placeholder="Username"><button class="btn" onclick="doViewWarnings()">View</button></div>
+        <div id="warn-list" style="margin-top:10px;"></div>
+      </div>
+    </div>
+
+    <!-- PASTE SECURITY -->
+    <div id="sec-pastesec" class="section">
+      <div class="page-title">Paste Security</div>
+      <div class="card"><h3>Remove Paste</h3>
+        <div class="input-row"><input class="inp" id="pr-url" placeholder="Paste URL or ID"><button class="btn btn-red" onclick="doPasteRemove()">Remove</button></div>
+        <div class="res" id="pr-res"></div>
+      </div>
+      <div class="card"><h3>Lockdown Paste (disable comments)</h3>
+        <div class="input-row"><input class="inp" id="pl-url" placeholder="Paste URL or ID"><button class="btn btn-red" onclick="doPasteLock()">Lock</button></div>
+        <div class="res" id="pl-res"></div>
+      </div>
+      <div class="card"><h3>Clear All Comments on Paste</h3>
+        <div class="input-row"><input class="inp" id="pc-url" placeholder="Paste URL or ID"><button class="btn btn-red" onclick="doPasteClear()">Clear</button></div>
+        <div class="res" id="pc-res"></div>
+      </div>
+      <div class="card"><h3>Pin Paste to Main Page</h3>
+        <div class="input-row"><input class="inp" id="pp-url" placeholder="Paste URL or ID"><button class="btn btn-gold" onclick="doPastePin()">Pin</button></div>
+        <div class="res" id="pp-res"></div>
+      </div>
+    </div>
+
+    <!-- HALL OF SHAME -->
+    <div id="sec-hof" class="section">
+      <div class="page-title">Hall of Shame</div>
+      <div class="card" style="max-width:600px;">
+        <h3>Add Entry</h3>
+        <div class="input-row"><input class="inp" id="hof-title" placeholder="Title"></div>
+        <div class="input-row"><textarea class="inp" id="hof-desc" placeholder="Description" style="resize:vertical;min-height:80px;"></textarea></div>
+        <div class="input-row"><input class="inp" id="hof-url" placeholder="Paste URL (will show as clickable 'paste')"></div>
+        <div class="input-row"><input class="inp" id="hof-img" placeholder="Image URL (shown at top of card)"></div>
+        <div class="input-row">
+          <button class="btn btn-gold" onclick="doAddHof()">Add to Hall of Shame</button>
+          <button class="btn" onclick="previewHof()">Preview</button>
+        </div>
+        <div class="res" id="hof-res"></div>
+        <div id="hof-preview-box" class="hof-preview" style="display:none;">
+          <img id="hof-prev-img">
+          <div class="hof-preview-title" id="hof-prev-title"></div>
+          <div class="hof-preview-desc" id="hof-prev-desc"></div>
+          <div style="margin-top:6px;font-size:12px;"><a href="#" style="color:#2A9FD6;">paste</a></div>
+        </div>
+      </div>
+      <div class="card" style="max-width:600px;">
+        <h3>Current Entries</h3>
+        <div id="hof-entries-list" style="font-size:13px;color:#555;margin-top:4px;">Loading...</div>
+      </div>
+    </div>
+
+    <!-- MAIN PAGE -->
+    <div id="sec-mainpage" class="section">
+      <div class="page-title">Main Page</div>
+      <div class="card"><h3>Edit Announcement Text</h3>
+        <div class="input-row"><input class="inp" id="mp-text" placeholder="New announcement text"></div>
+        <button class="btn btn-gold" onclick="doEditMainText()">Save</button>
+        <div class="res" id="mp-text-res"></div>
+      </div>
+      <div class="card"><h3>Edit Announcement URL</h3>
+        <div class="input-row"><input class="inp" id="mp-url" placeholder="New URL (https://...)"></div>
+        <button class="btn btn-gold" onclick="doEditMainUrl()">Save</button>
+        <div class="res" id="mp-url-res"></div>
+      </div>
+      <div class="card"><h3>Online Count Range</h3>
+        <p style="font-size:12px;color:#555;margin-bottom:10px;">Counter will drift naturally within range. Changing range will gradually move to the new range.</p>
+        <div class="input-row">
+          <select class="select" id="online-range">
+            <option value="1-100">1 – 100</option>
+            <option value="100-200">100 – 200</option>
+            <option value="300-400">300 – 400</option>
+            <option value="400-500">400 – 500</option>
+            <option value="500-600">500 – 600</option>
+            <option value="600-700">600 – 700</option>
+            <option value="800-900">800 – 900</option>
+            <option value="900-999">900 – 999</option>
+          </select>
+          <button class="btn btn-gold" onclick="doSetOnlineRange()">Apply</button>
+        </div>
+        <div class="res" id="online-range-res"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN MANAGEMENT -->
+    <div id="sec-admins" class="section">
+      <div class="page-title">Admin Management</div>
+      <div class="card"><h3>Grant Admin Permissions</h3>
+        <p style="font-size:12px;color:#555;margin-bottom:10px;">This user will access the admin panel without entering a key.</p>
+        <div class="input-row"><input class="inp" id="grant-user" placeholder="Username"><button class="btn btn-gold" onclick="doGrantAdmin()">Grant</button></div>
+        <div class="res" id="grant-res"></div>
+      </div>
+      <div class="card"><h3>Revoke Admin Permissions</h3>
+        <div class="input-row"><input class="inp" id="revoke-admin-user" placeholder="Username"><button class="btn btn-red" onclick="doRevokeAdmin()">Revoke</button></div>
+        <div class="res" id="revoke-admin-res"></div>
+      </div>
+      <div class="card"><h3>Current Admins (Showbin Elites)</h3>
+        <div id="admin-list" style="font-size:13px;color:#555;margin-top:4px;">Loading...</div>
+      </div>
+    </div>
+
+    <!-- MY CUSTOMIZATION -->
+    <div id="sec-customization" class="section">
+      <div class="page-title">My Customization</div>
+      <div class="card" style="max-width:520px;">
+        <h3>Admin Rank Name & Color</h3>
+        <p style="font-size:12px;color:#555;margin-bottom:12px;">Customize how your admin rank tag appears next to your name.</p>
+        <div class="input-row">
+          <input class="inp" id="cust-username" placeholder="Your username (to apply to)">
+        </div>
+        <div class="input-row">
+          <input class="inp" id="cust-rank-name" placeholder="Rank tag text (e.g. Owner, CEO, Staff)">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:12px;color:#555;display:block;margin-bottom:6px;">Color Style</label>
+          <select class="select" id="cust-color-style" style="width:100%;" onchange="updateCustPreview()">
+            <option value="light-red">Light Red Chroma + White</option>
+            <option value="light-green">Light Green Chroma + White</option>
+            <option value="light-blue">Light Blue Chroma + White</option>
+            <option value="light-purple">Light Purple Chroma + White</option>
+            <option value="light-gold">Light Gold Chroma + White</option>
+            <option value="dark-red">Dark Red Chroma + Black</option>
+            <option value="dark-green">Dark Green Chroma + Black</option>
+            <option value="dark-blue">Dark Blue Chroma + Black</option>
+            <option value="dark-purple">Dark Purple Chroma + Black</option>
+            <option value="boss-bw">Black & White Chroma</option>
+            <option value="custom-hex">Custom Hex Color</option>
+          </select>
+        </div>
+        <div class="input-row" id="cust-hex-row" style="display:none;">
+          <input class="inp" id="cust-hex" placeholder="#FF4444" oninput="updateCustPreview()">
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px;color:#555;display:block;margin-bottom:6px;">Preview</label>
+          <div style="background:#0a0a0a;border:1px solid #1c1c1c;padding:10px 14px;font-size:13.5px;">
+            <span id="cust-preview-name" style="color:#fff;font-weight:600;">Username</span>
+            <span id="cust-preview-tag" style="font-size:11px;margin-left:4px;">[Tag]</span>
+          </div>
+        </div>
+        <button class="btn btn-gold" onclick="doSaveCust()">Save Customization</button>
+        <div class="res" id="cust-res"></div>
+      </div>
+    </div>
+
+    <!-- CHAT SETTINGS -->
+    <div id="sec-chatsettings" class="section">
+      <div class="page-title">Chat Settings</div>
+      <div class="card"><h3>Chat Visibility</h3>
+        <div class="input-row">
+          <button class="btn btn-green" onclick="setChatMode('open')">Open Chat</button>
+          <button class="btn btn-red" onclick="setChatMode('closed')">Close Chat</button>
+          <button class="btn" onclick="setChatMode('locked')">Lock Chat (read-only)</button>
+        </div>
+        <div class="res" id="chat-mode-res"></div>
+      </div>
+      <div class="card"><h3>Timeout User (mute in chat)</h3>
+        <div class="input-row">
+          <input class="inp" id="to-user" placeholder="Username">
+          <input class="inp" id="to-dur" placeholder="Duration (e.g. 10m, 1h)">
+          <button class="btn btn-red" onclick="doChatTimeout()">Timeout</button>
+        </div>
+        <div class="res" id="to-res"></div>
+      </div>
+      <div class="card"><h3>Suspend User from Chat</h3>
+        <div class="input-row">
+          <input class="inp" id="cs-user" placeholder="Username">
+          <button class="btn btn-red" onclick="doChatSuspend()">Suspend from Chat</button>
+        </div>
+        <div class="res" id="cs-res"></div>
+      </div>
+    </div>
+
+    <!-- CHAT USERS -->
+    <div id="sec-chatusers" class="section">
+      <div class="page-title">Chat Users</div>
+      <div class="card" style="max-width:600px;">
+        <h3>Recent Chat Messages</h3>
+        <div id="chat-user-list" class="chat-user-list"></div>
+      </div>
+    </div>
+
+    <!-- LOGIN AS USER -->
+    <div id="sec-adminlogin" class="section">
+      <div class="page-title">Login as User</div>
+      <div class="card">
+        <h3>Log into any account</h3>
+        <p style="font-size:12px;color:#555;margin-bottom:12px;">Enter credentials to log in directly without going through the login page.</p>
+        <div class="input-row"><input class="inp" id="al-user" placeholder="Username"></div>
+        <div class="input-row"><input class="inp" type="password" id="al-pass" placeholder="Password"></div>
+        <button class="btn btn-gold" onclick="doAdminLogin()">Log In</button>
+        <div class="res" id="al-res"></div>
+      </div>
+      <div class="card">
+        <h3>Create Account</h3>
+        <p style="font-size:12px;color:#555;margin-bottom:12px;">Create a new account directly from the admin panel.</p>
+        <div class="input-row"><input class="inp" id="ca-user" placeholder="Username"></div>
+        <div class="input-row"><input class="inp" type="password" id="ca-pass" placeholder="Password"></div>
+        <button class="btn btn-green" onclick="doAdminCreateAccount()">Create</button>
+        <div class="res" id="ca-res"></div>
+      </div>
+    </div>
+
+    <!-- RECENT VISITORS -->
+    <div id="sec-recentvisitors" class="section">
+      <div class="page-title">Recent Visitors</div>
+      <div class="card" style="max-width:700px;">
+        <h3>All Website Visits</h3>
+        <p style="font-size:12px;color:#444;margin-bottom:12px;">Newest first. Records up to 100 visits.</p>
+        <div id="rv-list" style="font-size:12.5px;color:#555;">Loading...</div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /adminWrap -->
+
+<!-- IP DETAIL MODAL -->
+<div class="modal-overlay" id="ipModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('ipModal')">×</button>
+    <h3 id="ipModal-title">IP Detail</h3>
+    <div id="ipModal-body" style="font-size:13px;color:#aaa;margin-top:8px;"></div>
+  </div>
+</div>
+
+<!-- USER ACTION MODAL (from chat) -->
+<div class="modal-overlay" id="chatUserModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('chatUserModal')">×</button>
+    <h3 id="cum-title">User Actions</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;" id="cum-actions"></div>
+  </div>
+</div>
+
+<script src="showbin.js"></script>
+<script>
+const SECRET_HASH = '081c9aca769fcc4a53bb3d45ce63d21216cf9355165f1ac86e7d30623dc3487a';
+
+// ── HELPERS ──
+function getUsers(){try{return JSON.parse(localStorage.getItem('sb_users')||'{}')}catch{return{}}}
+function saveUsers(u){localStorage.setItem('sb_users',JSON.stringify(u))}
+function getUser(un){const u=getUsers();return u[un.toLowerCase()]||null}
+function saveUser(un,data){const u=getUsers();u[un.toLowerCase()]=data;saveUsers(u)}
+function ts(){return new Date().toLocaleString()}
+function res(id,msg,ok){const el=document.getElementById(id);el.textContent=msg;el.className='res '+(ok?'ok':'err')}
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+function openModal(id){document.getElementById(id).classList.add('show')}
+
+// ── LOCK ──
+async function hashInput(str){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function checkKey(){
+  const val=document.getElementById('lockInput').value;
+  // check if user has admin perms (bypass key)
+  try{
+    const cur=JSON.parse(localStorage.getItem('sb_user'));
+    if(cur){const users=getUsers();const u=users[cur.username.toLowerCase()];if(u&&u.isAdmin){document.getElementById('lockScreen').style.display='none';showWelcome();return;}}
+  }catch{}
+  const hashed=await hashInput(val);
+  if(hashed===SECRET_HASH){
+    document.getElementById('lockScreen').style.display='none';
+    showWelcome();
+  } else {
+    document.getElementById('lockErr').textContent='Invalid key.';
+    document.getElementById('lockInput').value='';
+  }
+}
+document.getElementById('lockInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkKey()});
+
+function showWelcome(){
+  const ws=document.getElementById('welcomeScreen');
+  const wt=document.getElementById('welcomeText');
+  ws.style.display='flex';
+  setTimeout(()=>{wt.style.opacity='1'},100);
+  setTimeout(()=>{wt.style.opacity='0'},900);
+  setTimeout(()=>{
+    ws.style.display='none';
+    document.getElementById('adminWrap').style.display='flex';
+    loadHofEntries();
+    loadChatUsers();
+    loadAdminList();
+  },1500);
+}
+
+function adminLogout(){
+  document.getElementById('adminWrap').style.display='none';
+  document.getElementById('lockScreen').style.display='flex';
+  document.getElementById('lockInput').value='';
+  document.getElementById('lockErr').textContent='';
+}
+
+// ── NAV (handled at bottom of script) ──
+
+function showSecTab(name){
+  document.querySelectorAll('.sec-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sec-page').forEach(p=>p.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('sectab-'+name).classList.add('active');
+}
+
+// ── GIFTING ──
+function doGift(){
+  const un=document.getElementById('gift-user').value.trim();
+  const rank=document.getElementById('gift-rank').value;
+  if(!un)return res('gift-res','Enter a username.',false);
+  const u=getUser(un);
+  if(!u)return res('gift-res','User not found.',false);
+  u.rank=rank;
+  saveUser(un,u);
+  res('gift-res',`Gifted [${rank}] to ${u.username}.`,true);
+}
+
+// ── REVOKE ──
+function doRevoke(){
+  const un=document.getElementById('revoke-user').value.trim();
+  if(!un)return res('revoke-res','Enter a username.',false);
+  const u=getUser(un);
+  if(!u)return res('revoke-res','User not found.',false);
+  delete u.rank;
+  saveUser(un,u);
+  res('revoke-res',`Rank removed from ${u.username}.`,true);
+}
+
+// ── SUSPEND ──
+function doSuspend(){
+  const un=document.getElementById('suspend-user').value.trim();
+  const dur=document.getElementById('suspend-dur').value.trim();
+  if(!un||!dur)return res('suspend-res','Enter username and duration.',false);
+  const u=getUser(un);
+  if(!u)return res('suspend-res','User not found.',false);
+  u.suspended=true;
+  u.suspendDur=dur;
+  u.suspendTs=Date.now();
+  saveUser(un,u);
+  // force logout
+  try{const cur=JSON.parse(localStorage.getItem('sb_user'));if(cur&&cur.username.toLowerCase()===un.toLowerCase())localStorage.removeItem('sb_user')}catch{}
+  res('suspend-res',`${u.username} suspended for ${dur}.`,true);
+}
+function doUnsuspend(){
+  const un=document.getElementById('unsuspend-user').value.trim();
+  if(!un)return res('unsuspend-res','Enter a username.',false);
+  const u=getUser(un);
+  if(!u)return res('unsuspend-res','User not found.',false);
+  delete u.suspended;delete u.suspendDur;delete u.suspendTs;
+  saveUser(un,u);
+  res('unsuspend-res',`${u.username} unsuspended.`,true);
+}
+
+// ── MONITOR ──
+function doMonitor(){
+  const un=document.getElementById('mon-user').value.trim();
+  if(!un)return res('mon-res','Enter a username.',false);
+  const u=getUser(un);
+  if(!u)return res('mon-res','User not found.',false);
+  document.getElementById('mon-res').textContent='';
+  document.getElementById('mon-uname').textContent=u.username;
+  document.getElementById('mon-ipv4').textContent=u.ipv4||'Not recorded';
+  document.getElementById('mon-ipv6').textContent=u.ipv6||'Not recorded';
+  document.getElementById('mon-country').textContent=u.country||'Unknown';
+  document.getElementById('mon-ts').textContent=u.lastLogin||'Never';
+  document.getElementById('mon-data').style.display='block';
+  // store for modal
+  window._monUser=u;
+}
+function showIpDetail(type){
+  if(!window._monUser)return;
+  document.getElementById('ipModal-title').textContent=`${window._monUser.username} — ${type.toUpperCase()}`;
+  const val=window._monUser[type]||'Not recorded';
+  document.getElementById('ipModal-body').textContent=val;
+  openModal('ipModal');
+}
+
+// ── BLACKLIST ──
+function doBlacklist(){
+  const un=document.getElementById('bl-user').value.trim();
+  if(!un)return res('bl-res','Enter a username.',false);
+  const u=getUser(un);
+  if(!u)return res('bl-res','User not found.',false);
+  u.blacklisted=true;u.suspended=true;u.suspendDur='permanent';
+  saveUser(un,u);
+  try{const cur=JSON.parse(localStorage.getItem('sb_user'));if(cur&&cur.username.toLowerCase()===un.toLowerCase())localStorage.removeItem('sb_user')}catch{}
+  res('bl-res',`${u.username} blacklisted. IP banned.`,true);
+}
+
+// ── DETECTION ──
+function doDetect(){
+  const un=document.getElementById('det-user').value.trim();
+  if(!un)return res('det-res','Enter a username.',false);
+  const u=getUser(un);
+  if(!u)return res('det-res','User not found.',false);
+  const ip=u.ipv4||null;
+  if(!ip)return res('det-res','No IP recorded for this user.',false);
+  const all=getUsers();
+  const linked=Object.values(all).filter(x=>x.username.toLowerCase()!==un.toLowerCase()&&x.ipv4===ip).map(x=>x.username);
+  if(!linked.length)return res('det-res','No other accounts share this IP.',true);
+  res('det-res','Linked accounts: '+linked.join(', '),true);
+}
+
+// ── LOGOUT USER ──
+function doLogoutUser(){
+  const un=document.getElementById('lo-user').value.trim();
+  if(!un)return res('lo-res','Enter a username.',false);
+  const u=getUser(un);
+  if(!u)return res('lo-res','User not found.',false);
+  try{const cur=JSON.parse(localStorage.getItem('sb_user'));if(cur&&cur.username.toLowerCase()===un.toLowerCase())localStorage.removeItem('sb_user')}catch{}
+  res('lo-res',`All sessions for ${u.username} logged out.`,true);
+}
+
+// ── VIEW PASSWORD ──
+function doViewPass(){
+  const un=document.getElementById('pw-user').value.trim();
+  if(!un)return res('pw-res','Enter a username.',false);
+  const u=getUser(un);
+  if(!u)return res('pw-res','User not found.',false);
+  if(!u.password)return res('pw-res','No password stored.',false);
+  try{res('pw-res','Password: '+atob(u.password),true);}catch{res('pw-res','Could not decode password.',false);}
+}
+
+// ── RESET PASSWORD ──
+function doResetPass(){
+  const un=document.getElementById('rp-user').value.trim();
+  if(!un)return res('rp-res','Enter a username.',false);
+  const u=getUser(un);
+  if(!u)return res('rp-res','User not found.',false);
+  const token=btoa(un+':'+Date.now());
+  u.resetToken=token;
+  saveUser(un,u);
+  const link=location.origin+location.pathname.replace('admin.html','reset-password.html')+'?token='+encodeURIComponent(token);
+  document.getElementById('rp-res').innerHTML='<span class="ok">Link: </span><a href="'+link+'" target="_blank" style="color:#2A9FD6;word-break:break-all;">'+link+'</a>';
+}
+
+// ── VIEW ACCOUNT ──
+function doViewAccount(){
+  const un=document.getElementById('acc-user').value.trim();
+  if(!un)return res('acc-res','Enter a username.',false);
+  // always re-read fresh from storage
+  const u=getUser(un);
+  if(!u)return res('acc-res','User not found.',false);
+  document.getElementById('acc-res').textContent='';
+  const users=getUsers();
+  const keys=Object.keys(users);
+  const uid=keys.indexOf(un.toLowerCase())+1;
+  const warns=(u.warnings||[]).length;
+  const pastes=getPastes().filter(p=>p.author&&p.author.toLowerCase()===un.toLowerCase()).length;
+
+  // build rank display: show gifted rank + admin rank name if present
+  let rankDisplay='None';
+  const parts=[];
+  if(u.rank) parts.push(u.rank.charAt(0).toUpperCase()+u.rank.slice(1));
+  if(u.adminRankName) parts.push('['+u.adminRankName+']');
+  if(parts.length) rankDisplay=parts.join(' + ');
+
+  document.getElementById('acc-data').style.display='block';
+  document.getElementById('acc-data').innerHTML=`
+    <div class="info-row"><span class="info-label">Username</span><span class="info-val">${escHtml(u.username)}</span></div>
+    <div class="info-row"><span class="info-label">UID</span><span class="info-val">#${uid}</span></div>
+    <div class="info-row"><span class="info-label">Joined</span><span class="info-val">${u.joined||'Unknown'}</span></div>
+    <div class="info-row"><span class="info-label">Rank</span><span class="info-val">${rankDisplay}</span></div>
+    <div class="info-row"><span class="info-label">Admin</span><span class="info-val">${u.isAdmin?'Yes':'No'}</span></div>
+    <div class="info-row"><span class="info-label">Pastes</span><span class="info-val">${pastes}</span></div>
+    <div class="info-row"><span class="info-label">Warnings</span><span class="info-val">${warns}</span></div>
+    <div class="info-row"><span class="info-label">Suspended</span><span class="info-val">${u.suspended?'Yes ('+u.suspendDur+')':'No'}</span></div>
+    <div class="info-row"><span class="info-label">Blacklisted</span><span class="info-val">${u.blacklisted?'Yes':'No'}</span></div>
+    <div class="info-row"><span class="info-label">Last Login</span><span class="info-val">${u.lastLogin||'Never'}</span></div>
+    <div class="info-row"><span class="info-label">IPv4</span><span class="info-val">${u.ipv4||'Not recorded'}</span></div>
+    <div class="info-row"><span class="info-label">Country</span><span class="info-val">${u.country||'Unknown'}</span></div>
+  `;
+}
+
+// ── PROFILE CLEAR ──
+function doClearBio(){
+  const un=document.getElementById('cbio-user').value.trim();
+  const u=getUser(un);if(!u)return res('cbio-res','User not found.',false);
+  delete u.bio;saveUser(un,u);res('cbio-res','Bio cleared.',true);
+}
+function doClearPfp(){
+  const un=document.getElementById('cpfp-user').value.trim();
+  const u=getUser(un);if(!u)return res('cpfp-res','User not found.',false);
+  delete u.pfp;saveUser(un,u);res('cpfp-res','Profile picture cleared.',true);
+}
+function doClearBanner(){
+  const un=document.getElementById('cban-user').value.trim();
+  const u=getUser(un);if(!u)return res('cban-res','User not found.',false);
+  delete u.banner;saveUser(un,u);res('cban-res','Banner cleared.',true);
+}
+
+// ── WARNING ──
+function doWarn(){
+  const un=document.getElementById('warn-user').value.trim();
+  const title=document.getElementById('warn-title').value.trim();
+  const desc=document.getElementById('warn-desc').value.trim();
+  if(!un||!title||!desc)return res('warn-res','Fill in all fields.',false);
+  const u=getUser(un);if(!u)return res('warn-res','User not found.',false);
+  if(!u.warnings)u.warnings=[];
+  u.warnings.push({title,desc,ts:ts()});
+  saveUser(un,u);
+  // add to user inbox
+  const inbox=JSON.parse(localStorage.getItem('sb_inbox_'+un.toLowerCase())||'[]');
+  inbox.unshift({type:'warning',title:'WARNING: '+title,body:desc,ts:ts(),read:false});
+  localStorage.setItem('sb_inbox_'+un.toLowerCase(),JSON.stringify(inbox));
+  res('warn-res',`Warning sent to ${u.username}.`,true);
+  document.getElementById('warn-user').value='';
+  document.getElementById('warn-title').value='';
+  document.getElementById('warn-desc').value='';
+}
+function doViewWarnings(){
+  const un=document.getElementById('warnview-user').value.trim();
+  const u=getUser(un);
+  const el=document.getElementById('warn-list');
+  if(!u)return(el.innerHTML='<span style="color:#ff4444">User not found.</span>');
+  const warns=u.warnings||[];
+  if(!warns.length)return(el.innerHTML='<span style="color:#555">No warnings for this user.</span>');
+  el.innerHTML=warns.map((w,i)=>`<div style="background:#0e0e0e;border:1px solid #1c1c1c;padding:10px;margin-bottom:8px;">
+    <div style="color:#ff8844;font-weight:600;font-size:12.5px;">#${i+1} — ${escHtml(w.title)}</div>
+    <div style="color:#888;font-size:12px;margin:4px 0;">${escHtml(w.desc)}</div>
+    <div style="color:#444;font-size:11px;">${w.ts}</div>
+  </div>`).join('');
+}
+
+// ── PASTE SECURITY ──
+function getPasteId(input){
+  // accept full URL like paste.html?id=xxxx or just the id
+  const m=input.match(/[?&]id=([^&]+)/);
+  return m?m[1]:input.trim();
+}
+function doPasteRemove(){
+  const id=getPasteId(document.getElementById('pr-url').value);
+  const pastes=getPastes().filter(p=>p.id!==id);
+  if(pastes.length===getPastes().length)return res('pr-res','Paste not found.',false);
+  savePastes(pastes);res('pr-res','Paste removed.',true);
+}
+function doPasteLock(){
+  const id=getPasteId(document.getElementById('pl-url').value);
+  const pastes=getPastes();const p=pastes.find(x=>x.id===id);
+  if(!p)return res('pl-res','Paste not found.',false);
+  p.commentsLocked=true;savePastes(pastes);res('pl-res','Comments locked on paste.',true);
+}
+function doPasteClear(){
+  const id=getPasteId(document.getElementById('pc-url').value);
+  localStorage.removeItem('sb_comments_'+id);
+  res('pc-res','Comments cleared.',true);
+}
+function doPastePin(){
+  const id=getPasteId(document.getElementById('pp-url').value);
+  const pastes=getPastes();const p=pastes.find(x=>x.id===id);
+  if(!p)return res('pp-res','Paste not found.',false);
+  p.pinned=true;savePastes(pastes);res('pp-res','Paste pinned to main page.',true);
+}
+
+// ── HOF ──
+function loadHofEntries(){
+  const entries=JSON.parse(localStorage.getItem('sb_hof')||'[]');
+  const el=document.getElementById('hof-entries-list');
+  if(!entries.length){el.innerHTML='<span style="color:#444;">No entries yet.</span>';return;}
+  el.innerHTML=entries.map((e,i)=>`<div style="padding:8px 0;border-bottom:1px solid #1a1a1a;display:flex;justify-content:space-between;align-items:center;">
+    <span style="color:#ccc;">${escHtml(e.title)}</span>
+    <button class="btn btn-red" style="font-size:11px;padding:4px 10px;" onclick="removeHofEntry(${i})">Remove</button>
+  </div>`).join('');
+}
+function removeHofEntry(i){
+  const entries=JSON.parse(localStorage.getItem('sb_hof')||'[]');
+  entries.splice(i,1);localStorage.setItem('sb_hof',JSON.stringify(entries));
+  loadHofEntries();
+}
+function previewHof(){
+  const title=document.getElementById('hof-title').value;
+  const desc=document.getElementById('hof-desc').value;
+  const img=document.getElementById('hof-img').value;
+  const box=document.getElementById('hof-preview-box');
+  document.getElementById('hof-prev-title').textContent=title;
+  document.getElementById('hof-prev-desc').textContent=desc;
+  const imgEl=document.getElementById('hof-prev-img');
+  if(img){imgEl.src=img;imgEl.style.display='block';}else{imgEl.style.display='none';}
+  box.style.display='block';
+}
+function doAddHof(){
+  const title=document.getElementById('hof-title').value.trim();
+  const desc=document.getElementById('hof-desc').value.trim();
+  const url=document.getElementById('hof-url').value.trim();
+  const img=document.getElementById('hof-img').value.trim();
+  if(!title||!desc)return res('hof-res','Title and description required.',false);
+  const entries=JSON.parse(localStorage.getItem('sb_hof')||'[]');
+  entries.push({title,desc,url,img,ts:ts()});
+  localStorage.setItem('sb_hof',JSON.stringify(entries));
+  res('hof-res','Entry added to Hall of Shame.',true);
+  document.getElementById('hof-title').value='';
+  document.getElementById('hof-desc').value='';
+  document.getElementById('hof-url').value='';
+  document.getElementById('hof-img').value='';
+  document.getElementById('hof-preview-box').style.display='none';
+  loadHofEntries();
+}
+
+// ── MAIN PAGE ──
+function doEditMainText(){
+  const t=document.getElementById('mp-text').value.trim();
+  if(!t)return res('mp-text-res','Enter text.',false);
+  localStorage.setItem('sb_announce_text',t);
+  res('mp-text-res','Announcement text saved.',true);
+}
+function doEditMainUrl(){
+  const u=document.getElementById('mp-url').value.trim();
+  if(!u)return res('mp-url-res','Enter URL.',false);
+  localStorage.setItem('sb_announce_url',u);
+  res('mp-url-res','Announcement URL saved.',true);
+}
+
+// ── CHAT SETTINGS ──
+function setChatMode(mode){
+  localStorage.setItem('sb_chat_mode',mode);
+  const msgs={open:'Chat opened.',closed:'Chat closed.',locked:'Chat locked (read-only).'};
+  res('chat-mode-res',msgs[mode],true);
+}
+function doChatTimeout(){
+  const un=document.getElementById('to-user').value.trim();
+  const dur=document.getElementById('to-dur').value.trim();
+  if(!un||!dur)return res('to-res','Enter username and duration.',false);
+  const timeouts=JSON.parse(localStorage.getItem('sb_chat_timeouts')||'{}');
+  timeouts[un.toLowerCase()]={dur,ts:Date.now()};
+  localStorage.setItem('sb_chat_timeouts',JSON.stringify(timeouts));
+  res('to-res',`${un} timed out for ${dur}.`,true);
+}
+function doChatSuspend(){
+  const un=document.getElementById('cs-user').value.trim();
+  if(!un)return res('cs-res','Enter a username.',false);
+  const suspends=JSON.parse(localStorage.getItem('sb_chat_suspends')||'{}');
+  suspends[un.toLowerCase()]=true;
+  localStorage.setItem('sb_chat_suspends',JSON.stringify(suspends));
+  res('cs-res',`${un} suspended from chat.`,true);
+}
+
+// ── CHAT USERS ──
+function loadChatUsers(){
+  const msgs=JSON.parse(localStorage.getItem('sb_chat')||'[]');
+  const el=document.getElementById('chat-user-list');
+  if(!msgs.length){el.innerHTML='<div style="padding:12px;color:#444;font-size:12px;">No chat messages.</div>';return;}
+  const seen=new Set();
+  const unique=msgs.filter(m=>{const k=(m.author||'Anonymous').toLowerCase();if(seen.has(k))return false;seen.add(k);return true;});
+  el.innerHTML=unique.map(m=>`<div class="chat-user-item">
+    <span class="cu-name" onclick="openChatUserActions('${escHtml(m.author||'Anonymous')}')">${escHtml(m.author||'Anonymous')}${m.rank?` [${m.rank}]`:''}</span>
+    <div class="cu-actions">
+      <button class="btn btn-red" style="font-size:11px;padding:3px 8px;" onclick="quickChatAction('timeout','${escHtml(m.author||'Anonymous')}')">Timeout</button>
+      <button class="btn btn-red" style="font-size:11px;padding:3px 8px;" onclick="quickChatAction('suspend','${escHtml(m.author||'Anonymous')}')">Suspend</button>
+      <button class="btn" style="font-size:11px;padding:3px 8px;" onclick="openChatUserActions('${escHtml(m.author||'Anonymous')}')">Actions</button>
+    </div>
+  </div>`).join('');
+}
+
+function quickChatAction(action,un){
+  if(action==='timeout'){
+    const dur=prompt(`Timeout duration for ${un} (e.g. 10m, 1h):`);
+    if(!dur)return;
+    const timeouts=JSON.parse(localStorage.getItem('sb_chat_timeouts')||'{}');
+    timeouts[un.toLowerCase()]={dur,ts:Date.now()};
+    localStorage.setItem('sb_chat_timeouts',JSON.stringify(timeouts));
+    alert(`${un} timed out for ${dur}.`);
+  } else {
+    const suspends=JSON.parse(localStorage.getItem('sb_chat_suspends')||'{}');
+    suspends[un.toLowerCase()]=true;
+    localStorage.setItem('sb_chat_suspends',JSON.stringify(suspends));
+    alert(`${un} suspended from chat.`);
+  }
+}
+
+function openChatUserActions(un){
+  document.getElementById('cum-title').textContent='Actions: '+un;
+  const isAnon=(un==='Anonymous');
+  const u=isAnon?null:getUser(un);
+
+  let html=`
+    <button class="btn btn-red" onclick="quickChatAction('timeout','${escHtml(un)}');closeModal('chatUserModal')">Timeout</button>
+    <button class="btn btn-red" onclick="quickChatAction('suspend','${escHtml(un)}');closeModal('chatUserModal')">Suspend from Chat</button>
+    <button class="btn btn-red" onclick="sendIPWarningCustom('${escHtml(un)}')">Send IP Warning</button>
+  `;
+  if(!isAnon&&u){
+    const ipv4=u.ipv4||null;
+    const ipv6=u.ipv6||null;
+    html+=`<div style="display:flex;gap:6px;margin-top:2px;">`;
+    html+=`<button class="btn" style="flex:1;" onclick="viewIPFromChat('${escHtml(un)}','ipv4')">View IPv4</button>`;
+    html+=`<button class="btn" style="flex:1;" onclick="viewIPFromChat('${escHtml(un)}','ipv6')">View IPv6</button>`;
+    html+=`</div>`;
+    html+=`
+      <button class="btn" onclick="doWarnFromChat('${escHtml(un)}')">Send Warning</button>
+      <button class="btn btn-red" onclick="doSuspendFromChat('${escHtml(un)}')">Suspend Account</button>
+    `;
+  }
+  if(isAnon||!u){
+    html+=`<button class="btn" onclick="checkAnonLinked('${escHtml(un)}')">Check Linked Accounts</button>`;
+  }
+
+  document.getElementById('cum-actions').innerHTML=html;
+  openModal('chatUserModal');
+}
+
+function viewIPFromChat(un, type){
+  const u=getUser(un);
+  if(!u)return alert('User not found.');
+  const val=u[type]||'Not recorded';
+  // show in a small popup within the modal
+  const existing=document.getElementById('ip-inline-view');
+  if(existing)existing.remove();
+  const d=document.createElement('div');
+  d.id='ip-inline-view';
+  d.style.cssText='margin-top:10px;background:#0a0a0a;border:1px solid #282828;padding:10px 12px;font-size:12.5px;color:#aaa;';
+  d.innerHTML=`<span style="color:#555;font-size:11px;">${type.toUpperCase()}</span><br><span style="color:#fff;word-break:break-all;">${val}</span>`;
+  document.getElementById('cum-actions').appendChild(d);
+}
+
+function sendIPWarningCustom(un){
+  closeModal('chatUserModal');
+  // show a small input popup
+  const existing=document.getElementById('ipWarnInputBox');
+  if(existing)existing.remove();
+  const d=document.createElement('div');
+  d.id='ipWarnInputBox';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#111;border:1px solid #282828;padding:24px;width:360px;z-index:9999;font-family:Inter,sans-serif;';
+  d.innerHTML=`
+    <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:12px;">Send IP Warning to ${escHtml(un)}</div>
+    <textarea id="ipWarnMsg" style="width:100%;background:#181818;border:1px solid #282828;color:#fff;padding:9px;font-size:13px;resize:vertical;min-height:80px;outline:none;font-family:inherit;" placeholder="Write your warning message..."></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button onclick="submitIPWarning()" style="flex:1;background:#4a1a1a;border:1px solid #6a2a2a;color:#ff8888;padding:9px;cursor:pointer;font-family:inherit;font-size:13px;">Send</button>
+      <button onclick="document.getElementById('ipWarnInputBox').remove()" style="background:#181818;border:1px solid #282828;color:#666;padding:9px;cursor:pointer;font-family:inherit;font-size:13px;">Cancel</button>
+    </div>
+  `;
+  document.body.appendChild(d);
+}
+
+function submitIPWarning(){
+  const msg=document.getElementById('ipWarnMsg').value.trim();
+  if(!msg)return;
+  localStorage.setItem('sb_ip_warning',msg);
+  document.getElementById('ipWarnInputBox').remove();
+  alert('IP warning queued. User will see it on next page load.');
+}
+
+// ── SUSPENDED CHECK (run on every page - called from index) ──
+function checkSuspendedOnLoad(){
+  try{
+    const cur=JSON.parse(localStorage.getItem('sb_user'));
+    if(!cur)return;
+    const u=getUser(cur.username);
+    if(!u||!u.suspended)return;
+    const screen=document.getElementById('suspendedScreen');
+    if(!screen)return;
+    let timerText='';
+    if(u.suspendDur&&u.suspendDur!=='permanent'&&u.suspendTs){
+      const ms=parseDuration(u.suspendDur);
+      const end=u.suspendTs+ms;
+      const rem=Math.max(0,end-Date.now());
+      if(rem>0){timerText=formatRemaining(rem)+' remaining.';}
+      else{delete u.suspended;delete u.suspendDur;delete u.suspendTs;saveUser(cur.username,u);return;}
+    } else if(u.suspendDur==='permanent'){timerText='Permanent suspension.';}
+    document.getElementById('suspendMsg').innerHTML=`Your account has been suspended from Showbin.<br><span style="color:#888;font-size:13px;">${timerText}</span>`;
+    screen.style.display='flex';
+  }catch{}
+}
+
+function parseDuration(s){
+  const m=s.match(/^(\d+)(m|h|d)$/i);if(!m)return 0;
+  const n=parseInt(m[1]);const u=m[2].toLowerCase();
+  if(u==='m')return n*60000;if(u==='h')return n*3600000;if(u==='d')return n*86400000;return 0;
+}
+function formatRemaining(ms){
+  const h=Math.floor(ms/3600000);const m=Math.floor((ms%3600000)/60000);const s=Math.floor((ms%60000)/1000);
+  if(h>0)return `${h}h ${m}m`;if(m>0)return `${m}m ${s}s`;return `${s}s`;
+}
+
+// ── CHECK BLACKLIST ──
+function checkBlacklistOnLoad(){
+  try{
+    const cur=JSON.parse(localStorage.getItem('sb_user'));
+    if(!cur)return;
+    const u=getUser(cur.username);
+    if(u&&u.blacklisted){
+      document.body.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#060606;color:#fff;text-align:center;padding:20px;gap:14px;"><h2 style="color:#ff4444;font-size:20px;">This IP has been blacklisted.</h2><p style="color:#888;font-size:14px;line-height:1.8;">Appeal: <a href="https://discord.gg/feTqVTrqAk" target="_blank" style="color:#5865F2;text-decoration:underline;">Discord</a> &nbsp;|&nbsp; <a href="https://t.me/xd9_aep" target="_blank" style="color:#229ED9;text-decoration:underline;">Telegram</a></p></div>';
+    }
+  }catch{}
+}
+checkBlacklistOnLoad();
+
+// ── ADMIN LOGIN AS USER ──
+function doAdminLogin(){
+  const un=document.getElementById('al-user').value.trim();
+  const pw=document.getElementById('al-pass').value;
+  if(!un||!pw)return res('al-res','Enter username and password.',false);
+  const u=getUser(un);
+  if(!u)return res('al-res','User not found.',false);
+  if(u.password!==btoa(pw))return res('al-res','Incorrect password.',false);
+  localStorage.setItem('sb_user',JSON.stringify({username:u.username,joined:u.joined,rank:u.rank||null}));
+  res('al-res','Logged in as '+u.username+'. Session saved.',true);
+}
+
+function doAdminCreateAccount(){
+  const un=document.getElementById('ca-user').value.trim();
+  const pw=document.getElementById('ca-pass').value;
+  if(!un||!pw)return res('ca-res','Enter username and password.',false);
+  if(!/^[a-zA-Z0-9_]+$/.test(un))return res('ca-res','Username: letters, numbers, underscores only.',false);
+  const users=getUsers();
+  if(users[un.toLowerCase()])return res('ca-res','Username already taken.',false);
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const now=new Date();
+  users[un.toLowerCase()]={
+    username:un,password:btoa(pw),
+    joined:`${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`
+  };
+  saveUsers(users);
+  res('ca-res','Account '+un+' created.',true);
+}
+
+// ── AUTO-CREATE xd9 ACCOUNT IF NOT EXISTS ──
+(function(){
+  try{
+    const users=JSON.parse(localStorage.getItem('sb_users')||'{}');
+    if(!users['xd9']){
+      const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const now=new Date();
+      users['xd9']={
+        username:'xd9',
+        password:btoa('K#9mP$vL2nQ@wX5jR!tY8hZ4s'),
+        joined:`${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`,
+        isAdmin:true,
+        adminRankName:'Owner',
+        adminRankStyle:'background:linear-gradient(90deg,#fff,#aaa,#333,#fff);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:chromaAnim 4s ease infinite;font-weight:600;'
+      };
+      localStorage.setItem('sb_users',JSON.stringify(users));
+      // add to elites
+      const elites=JSON.parse(localStorage.getItem('sb_elites')||'[]');
+      if(!elites.includes('xd9'))elites.push('xd9');
+      localStorage.setItem('sb_elites',JSON.stringify(elites));
+    }
+  }catch{}
+})();
+(function(){
+  try{
+    const cur=JSON.parse(localStorage.getItem('sb_user'));
+    if(!cur)return;
+    const users=JSON.parse(localStorage.getItem('sb_users')||'{}');
+    const u=users[cur.username.toLowerCase()];
+    if(u&&u.isAdmin){
+      document.getElementById('lockScreen').style.display='none';
+      showWelcome();
+    }
+  }catch{}
+})();
+
+// ── VISITORS ──
+function loadVisitors(){
+  const el=document.getElementById('mon-visitors');
+  if(!el)return;
+  const visits=JSON.parse(localStorage.getItem('sb_visits')||'[]');
+  if(!visits.length){el.innerHTML='<span style="color:#333;">No visits recorded yet.</span>';return;}
+  // newest first
+  const sorted=[...visits].reverse().slice(0,50);
+  el.innerHTML=sorted.map(v=>`
+    <div style="padding:6px 0;border-bottom:1px solid #111;display:flex;align-items:center;gap:0;font-size:12.5px;font-family:'Inter',monospace;">
+      <span style="color:${v.user?'#2A9FD6':'#555'};min-width:130px;">${escHtml(v.user||'Anonymous')}</span>
+      <span style="color:#444;margin:0 8px;">—</span>
+      <span style="color:#888;min-width:100px;">[${escHtml(v.country||'Unknown')}]</span>
+      <span style="color:#444;margin:0 8px;">—</span>
+      <span style="color:#666;min-width:120px;">${escHtml(v.ip||'—')}</span>
+      <span style="color:#333;font-size:11px;margin-left:auto;">${v.ts||''}</span>
+    </div>
+  `).join('');
+}
+
+function loadRecentVisitors(){
+  const el=document.getElementById('rv-list');
+  if(!el)return;
+  const visits=JSON.parse(localStorage.getItem('sb_visits')||'[]');
+  if(!visits.length){el.innerHTML='<span style="color:#333;">No visits recorded yet. Visits are tracked when users load the main page.</span>';return;}
+  const sorted=[...visits].reverse();
+  el.innerHTML=`
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr 1fr 1fr;gap:0;border-bottom:1px solid #1a1a1a;padding-bottom:6px;margin-bottom:6px;">
+      <span style="color:#444;font-size:11px;text-transform:uppercase;letter-spacing:.5px;">User</span>
+      <span style="color:#444;font-size:11px;text-transform:uppercase;letter-spacing:.5px;">IPv4</span>
+      <span style="color:#444;font-size:11px;text-transform:uppercase;letter-spacing:.5px;">IPv6</span>
+      <span style="color:#444;font-size:11px;text-transform:uppercase;letter-spacing:.5px;">Country</span>
+      <span style="color:#444;font-size:11px;text-transform:uppercase;letter-spacing:.5px;">Timestamp</span>
+    </div>
+    ${sorted.map(v=>`
+      <div style="display:grid;grid-template-columns:140px 1fr 1fr 1fr 1fr;gap:0;padding:5px 0;border-bottom:1px solid #0f0f0f;align-items:center;">
+        <span style="color:${v.user?'#2A9FD6':'#555'};">${escHtml(v.user||'Anonymous')}</span>
+        <span>
+          ${v.ip&&v.ip!=='Unknown'
+            ? `<span onclick="showRvIpDetail('${escHtml(v.ip||'')}','IPv4')" style="color:#2A9FD6;cursor:pointer;text-decoration:underline;font-size:12px;">${escHtml(v.ip)}</span>`
+            : `<span style="color:#333;">—</span>`}
+        </span>
+        <span>
+          ${v.ipv6&&v.ipv6!=='Unknown'
+            ? `<span onclick="showRvIpDetail('${escHtml(v.ipv6||'')}','IPv6')" style="color:#2A9FD6;cursor:pointer;text-decoration:underline;font-size:12px;">${escHtml(v.ipv6)}</span>`
+            : `<span style="color:#333;">—</span>`}
+        </span>
+        <span style="color:#888;font-size:12px;">${escHtml(v.country||'Unknown')}</span>
+        <span style="color:#444;font-size:11px;">${v.ts||'—'}</span>
+      </div>
+    `).join('')}
+  `;
+}
+
+function showRvIpDetail(ip, type){
+  const existing=document.getElementById('rv-ip-popup');
+  if(existing)existing.remove();
+  const d=document.createElement('div');
+  d.id='rv-ip-popup';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#111;border:1px solid #282828;padding:22px 24px;z-index:9999;font-family:Inter,sans-serif;min-width:280px;';
+  d.innerHTML=`
+    <div style="font-size:13px;color:#888;margin-bottom:6px;">${type}</div>
+    <div style="font-size:15px;color:#fff;word-break:break-all;margin-bottom:16px;">${escHtml(ip)}</div>
+    <button onclick="document.getElementById('rv-ip-popup').remove()" style="background:#222;border:1px solid #333;color:#888;padding:6px 16px;cursor:pointer;font-family:inherit;font-size:12px;">Close</button>
+  `;
+  document.body.appendChild(d);
+}
+
+// ── ONLINE RANGE ──
+function doSetOnlineRange(){
+  const val=document.getElementById('online-range').value;
+  localStorage.setItem('sb_online_range',val);
+  res('online-range-res','Online range set to '+val+'. Counter will drift to this range.',true);
+}
+
+// ── GRANT / REVOKE ADMIN ──
+function doGrantAdmin(){
+  const un=document.getElementById('grant-user').value.trim();
+  if(!un)return res('grant-res','Enter a username.',false);
+  const u=getUser(un);if(!u)return res('grant-res','User not found.',false);
+  u.isAdmin=true;saveUser(un,u);
+  // add to elites list
+  const elites=JSON.parse(localStorage.getItem('sb_elites')||'[]');
+  if(!elites.includes(un.toLowerCase()))elites.push(un.toLowerCase());
+  localStorage.setItem('sb_elites',JSON.stringify(elites));
+  res('grant-res',`${u.username} granted admin access.`,true);
+  loadAdminList();
+}
+function doRevokeAdmin(){
+  const un=document.getElementById('revoke-admin-user').value.trim();
+  if(!un)return res('revoke-admin-res','Enter a username.',false);
+  const u=getUser(un);if(!u)return res('revoke-admin-res','User not found.',false);
+  delete u.isAdmin;delete u.adminRankName;delete u.adminRankStyle;saveUser(un,u);
+  const elites=JSON.parse(localStorage.getItem('sb_elites')||'[]');
+  const idx=elites.indexOf(un.toLowerCase());
+  if(idx>-1)elites.splice(idx,1);
+  localStorage.setItem('sb_elites',JSON.stringify(elites));
+  res('revoke-admin-res',`${u.username} admin access revoked.`,true);
+  loadAdminList();
+}
+function loadAdminList(){
+  const el=document.getElementById('admin-list');
+  if(!el)return;
+  const elites=JSON.parse(localStorage.getItem('sb_elites')||'[]');
+  if(!elites.length){el.innerHTML='<span style="color:#444;">No admins assigned yet.</span>';return;}
+  const users=getUsers();
+  el.innerHTML=elites.map(un=>{
+    const u=users[un];if(!u)return '';
+    return `<div style="padding:7px 0;border-bottom:1px solid #1a1a1a;display:flex;justify-content:space-between;align-items:center;">
+      <span style="color:#ccc;">${escHtml(u.username)}${u.adminRankName?` <span style="font-size:11px;${u.adminRankStyle||'color:#fff'}">[${escHtml(u.adminRankName)}]</span>`:''}</span>
+      <button class="btn btn-red" style="font-size:11px;padding:3px 8px;" onclick="doRevokeAdminDirect('${escHtml(u.username)}')">Revoke</button>
+    </div>`;
+  }).join('');
+}
+function doRevokeAdminDirect(un){
+  const u=getUser(un);if(!u)return;
+  delete u.isAdmin;delete u.adminRankName;delete u.adminRankStyle;saveUser(un,u);
+  const elites=JSON.parse(localStorage.getItem('sb_elites')||'[]');
+  const idx=elites.indexOf(un.toLowerCase());
+  if(idx>-1)elites.splice(idx,1);
+  localStorage.setItem('sb_elites',JSON.stringify(elites));
+  loadAdminList();
+}
+
+// ── CUSTOMIZATION ──
+const CHROMA_STYLES={
+  'light-red':  'background:linear-gradient(90deg,#ff4444,#ff9999,#fff,#ff4444);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:chromaAnim 4s ease infinite;',
+  'light-green':'background:linear-gradient(90deg,#00cc44,#aaffaa,#fff,#00cc44);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:chromaAnim 4s ease infinite;',
+  'light-blue': 'background:linear-gradient(90deg,#2A9FD6,#aaeeff,#fff,#2A9FD6);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:chromaAnim 4s ease infinite;',
+  'light-purple':'background:linear-gradient(90deg,#bb71e4,#e8b4ff,#fff,#bb71e4);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:chromaAnim 4s ease infinite;',
+  'light-gold':  'background:linear-gradient(90deg,#f5c518,#ffe88a,#fff,#f5c518);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:chromaAnim 4s ease infinite;',
+  'dark-red':    'background:linear-gradient(90deg,#880000,#cc2222,#000,#880000);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:chromaAnim 4s ease infinite;',
+  'dark-green':  'background:linear-gradient(90deg,#004400,#007700,#000,#004400);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:chromaAnim 4s ease infinite;',
+  'dark-blue':   'background:linear-gradient(90deg,#00008b,#1133cc,#000,#00008b);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:chromaAnim 4s ease infinite;',
+  'dark-purple': 'background:linear-gradient(90deg,#3b0066,#6600aa,#000,#3b0066);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:chromaAnim 4s ease infinite;',
+  'boss-bw':     'background:linear-gradient(90deg,#fff,#aaa,#333,#fff);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:chromaAnim 4s ease infinite;',
+};
+
+function updateCustPreview(){
+  const style=document.getElementById('cust-color-style').value;
+  const hexRow=document.getElementById('cust-hex-row');
+  hexRow.style.display=style==='custom-hex'?'flex':'none';
+  const tag=document.getElementById('cust-preview-tag');
+  const name=document.getElementById('cust-rank-name').value||'Tag';
+  let css='';
+  if(style==='custom-hex'){
+    const hex=document.getElementById('cust-hex').value||'#ffffff';
+    css=`color:${hex};font-weight:600;`;
+  } else {
+    css=CHROMA_STYLES[style]||'color:#fff;';
+  }
+  tag.style.cssText=css;
+  tag.textContent='['+name+']';
+}
+document.getElementById('cust-color-style').addEventListener('change',updateCustPreview);
+document.getElementById('cust-rank-name').addEventListener('input',updateCustPreview);
+
+function doSaveCust(){
+  const un=document.getElementById('cust-username').value.trim();
+  if(!un)return res('cust-res','Enter your username.',false);
+  const u=getUser(un);if(!u)return res('cust-res','User not found.',false);
+  if(!u.isAdmin)return res('cust-res','This user does not have admin permissions.',false);
+  const style=document.getElementById('cust-color-style').value;
+  const name=document.getElementById('cust-rank-name').value.trim();
+  if(!name)return res('cust-res','Enter a rank name.',false);
+  let css='';
+  if(style==='custom-hex'){
+    const hex=document.getElementById('cust-hex').value||'#ffffff';
+    css=`color:${hex};font-weight:600;`;
+  } else {
+    css=CHROMA_STYLES[style]||'color:#fff;';
+  }
+  u.adminRankName=name;
+  u.adminRankStyle=css;
+  saveUser(un,u);
+  res('cust-res','Customization saved for '+u.username+'.',true);
+  loadAdminList();
+}
+
+// Init on section load
+function showSection(name){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  if(name==='hof')loadHofEntries();
+  if(name==='chatusers')loadChatUsers();
+  if(name==='admins')loadAdminList();
+  if(name==='monitor')loadVisitors();
+  if(name==='recentvisitors')loadRecentVisitors();
+  if(name==='customization')updateCustPreview();
+  // load saved online range into select
+  if(name==='mainpage'){
+    const saved=localStorage.getItem('sb_online_range')||'1-100';
+    const sel=document.getElementById('online-range');
+    if(sel)sel.value=saved;
+  }
+}
+</script>
+</body>
+</html>

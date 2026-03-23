@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+    <title>Upload | Showbin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="all.min.css">
+    <style>
+        input { outline: none !important; box-shadow: none !important; }
+        input:focus { outline: none !important; box-shadow: none !important; }
+        *:focus { outline: none !important; box-shadow: none !important; }
+        input, textarea, select { font-size: 16px !important; }
+        ::-webkit-scrollbar { display: none; }
+        html { -ms-overflow-style: none; scrollbar-width: none; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .upload-container {
+            display: flex;
+            height: 100vh;
+        }
+        .text-area {
+            flex: 1;
+            background: #0C0C0C;
+            position: relative;
+        }
+        .text-area textarea {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: monospace;
+            font-size: 13px;
+            resize: none;
+            padding: 10px 20px;
+            margin: 0;
+            margin-top: 10px;
+            white-space: pre;
+            tab-size: 4;
+            -moz-tab-size: 4;
+            word-wrap: break-word;
+        }
+        .text-area textarea:focus { outline: none; }
+        .sidebar {
+            width: 280px;
+            background: #181818;
+            padding: 10px 12px;
+            position: fixed;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            transition: transform 0.3s ease;
+            text-align: center;
+            overflow: hidden;
+        }
+        .sidebar.hidden { transform: translateX(100%); }
+        .toggle-sidebar {
+            position: fixed;
+            right: 304px;
+            top: 0;
+            background: #181818;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 18px;
+            z-index: 1000;
+            padding: 6px 10px;
+            border-radius: 0;
+            transition: right 0.3s ease;
+        }
+        .toggle-sidebar:hover { background: #222; }
+        .ascii-art {
+            color: #fff;
+            font-family: monospace;
+            white-space: pre;
+            font-size: 11px;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            margin-top: 0;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .form-group label {
+            display: block;
+            color: #fff;
+            margin-bottom: 5px;
+            font-size: 13px;
+            text-align: center;
+        }
+        .username-field {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+        .username-field span { color: #fff; font-size: 13px; }
+        .username-field a { color: #888; text-decoration: none; font-size: 13px; }
+        .username-field a:hover { text-decoration: underline; }
+        .form-group input[type="text"],
+        .form-group input[type="password"] {
+            width: 100%;
+            background: #545454;
+            border: 1px solid #282828;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 13px;
+            border-radius: 3px;
+        }
+        .form-group input::placeholder { color: #bfbfbf; }
+        .notify-followers {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 0 2px;
+        }
+        .notify-followers label { color: #fff; font-size: 13px; margin-bottom: 0; }
+        input[type="radio"],
+        input[type="checkbox"] { margin: 0; }
+        .button {
+            width: 100%;
+            background: #545454;
+            border: 1px solid #282828;
+            color: #fff;
+            padding: 8px 0;
+            cursor: pointer;
+            font-size: 13px;
+            border-radius: 3px;
+            margin-bottom: 0;
+            transition: all 0.2s;
+        }
+        .button:hover { background: #666; }
+        .tos-note {
+            color: #fff;
+            font-size: 13px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .tos-note a { color: #888; text-decoration: none; }
+        .tos-note a:hover { text-decoration: underline; }
+        .separator { border-top: 2px solid #747474; margin: 15px 0; }
+        input[type="radio"]:checked,
+        input[type="checkbox"]:checked { accent-color: #ff0000; }
+        .sidebar a { color: #888; text-decoration: none; }
+        .sidebar a:hover { text-decoration: underline; }
+        .error-message { color: #ff0000; margin: 10px 0; font-size: 13px; text-align: center; }
+        @keyframes breathe {
+            0%   { background: rgba(255,215,0,0.05); }
+            50%  { background: rgba(255,215,0,0.15); }
+            100% { background: rgba(255,215,0,0.05); }
+        }
+        .premium-upgrade {
+            animation: breathe 2s ease-in-out infinite;
+            transition: all 0.3s ease;
+            text-decoration: none !important;
+        }
+        .premium-upgrade:hover {
+            background: rgba(255,215,0,0.2) !important;
+            text-decoration: none !important;
+        }
+    </style>
+
+    <div class="upload-container">
+        <div class="text-area">
+            <textarea name="content" spellcheck="false"></textarea>
+        </div>
+        <button class="toggle-sidebar">☰</button>
+        <div class="sidebar">
+            <a href="index.html" style="text-decoration:none;">
+                <div class="ascii-art"> ___ _  _ _____      _____ ___ _  _ 
+/ __| || |/ _ \ \    / / _ )_ _| \| |
+\__ \ __ | (_) \ \/\/ /| _ \| || .` |
+|___/_||_|\___/ \_/\_/ |___/___|_|\_|</div>
+            </a>
+            <div class="error-message"></div>
+
+            <a href="upgrades.html" class="premium-upgrade" style="display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 12px;margin-bottom:15px;background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.2);text-decoration:none;">
+                <span style="font-size:14px;">⭐</span>
+                <span style="color:#FFD700;font-size:13px;font-weight:600;">Unlock Premium Features</span>
+            </a>
+
+            <form id="uploadForm" onsubmit="submitPaste(event)">
+                <div class="form-group">
+                    <div class="username-field">
+                        <span><a href="login.html">Login</a> or <a href="register.html">register</a> to manage your pastes.</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><strong>Title:</strong></label>
+                    <input type="text" name="title" placeholder="Paste title (no special chars)">
+                </div>
+
+                <div class="separator"></div>
+
+                <div class="notify-followers">
+                    <label>Notify Followers</label>
+                    <input type="checkbox" name="notify_followers">
+                </div>
+
+                <input type="hidden" name="visibility" value="public">
+
+                <button type="submit" class="button">Create</button>
+
+                <div class="separator"></div>
+
+                <div class="tos-note">
+                    Please note that all posted information is publicly available and must follow our <a href="tos.html">TOS</a>.
+                </div>
+                <div class="separator"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="showbin.js"></script>
+    <script>
+        async function submitPaste(e) {
+            e.preventDefault();
+            const form = document.getElementById('uploadForm');
+            const errorDiv = document.querySelector('.error-message');
+            const title = form.querySelector('input[name="title"]').value.trim() || 'Untitled';
+            const content = document.querySelector('textarea[name="content"]').value;
+            if (!content.trim()) { errorDiv.textContent = 'Please enter some content.'; return; }
+            const id = addPaste(title, content);
+            window.location.href = 'paste.html?id=' + id;
+        }
+
+        const toggleButton = document.querySelector('.toggle-sidebar');
+        const sidebar = document.querySelector('.sidebar');
+        toggleButton.addEventListener('click', function() {
+            sidebar.classList.toggle('hidden');
+            toggleButton.style.right = sidebar.classList.contains('hidden') ? '0' : '304px';
+        });
+
+        document.querySelector('.text-area textarea').addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                var start = this.selectionStart, end = this.selectionEnd;
+                this.value = this.value.substring(0, start) + '\t' + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + 1;
+            }
+        });
+
+        // Online count
+        let _n = 38 + Math.floor(Math.random() * 15);
+        function tick() {
+            if (Math.random() > 0.5) _n += Math.random() > 0.5 ? 1 : -1;
+            _n = Math.max(20, Math.min(80, _n));
+            const el = document.getElementById('onlineCount');
+            if (el) { el.textContent = _n; el.style.display = 'flex'; el.classList.add('connected'); }
+        }
+        tick(); setInterval(tick, 5000);
+    </script>
+<!-- CONTACT MODAL -->
+<div id="contactModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;" onclick="if(event.target===this)closeContact()">
+    <div style="background:#111;border:1px solid #282828;padding:32px 28px;max-width:360px;width:90%;text-align:center;position:relative;">
+        <button onclick="closeContact()" style="position:absolute;top:10px;right:14px;background:none;border:none;color:#666;font-size:22px;cursor:pointer;line-height:1;">×</button>
+        <h2 style="font-size:17px;font-weight:600;color:#fff;margin-bottom:8px;">Contact Support</h2>
+        <p style="font-size:13px;color:#888;margin-bottom:22px;line-height:1.6;">Reach us on Discord or Telegram for support, inquiries, or reports.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="https://discord.gg/feTqVTrqAk" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;gap:9px;background:#5865F2;color:#fff;padding:11px 22px;text-decoration:none;font-size:13.5px;font-weight:600;" onmouseover="this.style.background='#4752c4'" onmouseout="this.style.background='#5865F2'"><svg viewBox="0 0 24 24" fill="white" style="width:18px;height:18px;flex-shrink:0;"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.03.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 13.93 13.93 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.175 13.175 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>Discord</a>
+            <a href="https://t.me/xd9_aep" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;gap:9px;background:#229ED9;color:#fff;padding:11px 22px;text-decoration:none;font-size:13.5px;font-weight:600;" onmouseover="this.style.background='#1a8abf'" onmouseout="this.style.background='#229ED9'"><svg viewBox="0 0 24 24" fill="white" style="width:18px;height:18px;flex-shrink:0;"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 13.67l-2.965-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.963.889z"/></svg>Telegram</a>
+        </div>
+    </div>
+</div>
+<script>function openContact(e){e.preventDefault();document.getElementById("contactModal").style.display="flex";}
+    function closeContact(){document.getElementById("contactModal").style.display="none";}</script>
+</body></html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+    <title>Login | Showbin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="nav.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #060606; color: #fff; }
+        .wrap { max-width: 340px; margin: 80px auto; padding: 0 20px; }
+        h1 { font-size: 18px; font-weight: 600; margin-bottom: 22px; color: #fff; }
+        .field { margin-bottom: 14px; }
+        .field label { display: block; font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 5px; }
+        .field input { width: 100%; background: #111; border: none; border-bottom: 1px solid #282828; color: #fff; font-size: 14px; padding: 8px 10px; outline: none; font-family: inherit; }
+        .field input:focus { border-bottom-color: #555; }
+        .btn { width: 100%; background: #181818; border: 1px solid #282828; color: #fff; font-size: 13.5px; font-weight: 500; padding: 10px; cursor: pointer; font-family: inherit; margin-top: 6px; }
+        .btn:hover { background: #222; }
+        .err { color: #ff4444; font-size: 12.5px; margin-top: 10px; display: none; }
+        .back { margin-top: 16px; font-size: 12.5px; color: #444; }
+        .back a { color: #666; text-decoration: none; }
+        .back a:hover { color: #aaa; }
+    </style>
+</head>
+<body>
+<nav>
+    <div class="container">
+        <div class="nav-brand"><a href="index.html">Showbin</a></div>
+        <div class="nav-wrapper">
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="add.html">Add Paste</a></li>
+                <li><a href="upgrades.html">Upgrades</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="wrap">
+    <h1>Login</h1>
+    <div class="field"><label>Username</label><input type="text" id="un" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input type="password" id="pw" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn" onclick="doLogin()">Login</button>
+    <div class="err" id="err"></div>
+    <div class="back"><a href="javascript:history.back()">← Go back</a></div>
+</div>
+<script>
+    // Auto-create xd9 account if missing
+    (function(){
+        try{
+            const users=JSON.parse(localStorage.getItem('sb_users')||'{}');
+            if(!users['xd9']){
+                const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                const now=new Date();
+                users['xd9']={username:'xd9',password:btoa('K#9mP$vL2nQ@wX5jR!tY8hZ4s'),joined:`${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`,isAdmin:true,adminRankName:'Owner',adminRankStyle:'background:linear-gradient(90deg,#fff,#aaa,#333,#fff);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:chromaAnim 4s ease infinite;font-weight:600;'};
+                localStorage.setItem('sb_users',JSON.stringify(users));
+                const elites=JSON.parse(localStorage.getItem('sb_elites')||'[]');
+                if(!elites.includes('xd9'))elites.push('xd9');
+                localStorage.setItem('sb_elites',JSON.stringify(elites));
+            }
+        }catch{}
+    })();
+
+    // Redirect if already logged in
+    try{if(JSON.parse(localStorage.getItem('sb_user')))location.href='index.html';}catch{}
+
+    function doLogin(){
+        const un=document.getElementById('un').value.trim();
+        const pw=document.getElementById('pw').value;
+        const err=document.getElementById('err');
+        err.style.display='none';
+        if(!un||!pw){err.textContent='Please fill in all fields.';err.style.display='block';return;}
+        const users=JSON.parse(localStorage.getItem('sb_users')||'{}');
+        const user=users[un.toLowerCase()];
+        if(!user){err.textContent='Username not found.';err.style.display='block';return;}
+        if(user.password!==btoa(pw)){err.textContent='Incorrect password.';err.style.display='block';return;}
+        if(user.suspended){err.textContent='This account has been suspended.';err.style.display='block';return;}
+        if(user.blacklisted){err.textContent='This account has been blacklisted.';err.style.display='block';return;}
+        localStorage.setItem('sb_user',JSON.stringify({username:user.username,joined:user.joined,rank:user.rank||null,isAdmin:user.isAdmin||false}));
+        // update lastLogin in user record
+        const allUsers=JSON.parse(localStorage.getItem('sb_users')||'{}');
+        const now=new Date();
+        allUsers[un.toLowerCase()].lastLogin=now.toLocaleDateString()+' '+now.toLocaleTimeString();
+        localStorage.setItem('sb_users',JSON.stringify(allUsers));
+        // fetch IP for this login
+        fetch('https://ipapi.co/json/').then(r=>r.json()).then(d=>{
+            const u2=JSON.parse(localStorage.getItem('sb_users')||'{}');
+            if(u2[un.toLowerCase()]){u2[un.toLowerCase()].ipv4=d.ip;u2[un.toLowerCase()].country=d.country_name||d.country;}
+            localStorage.setItem('sb_users',JSON.stringify(u2));
+        }).catch(()=>{});
+        location.href='index.html';
+    }
+</script>
+</body>
+</html>

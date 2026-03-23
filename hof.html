@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+    <title>Hall of Shame | Showbin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="all.min.css">
+    <link rel="stylesheet" href="nav.css">
+    <style>
+        input { outline: none !important; box-shadow: none !important; }
+        *:focus { outline: none !important; box-shadow: none !important; }
+        ::-webkit-scrollbar { display: none; }
+        html { -ms-overflow-style: none; scrollbar-width: none; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+
+        .hoa-wrapper {
+            min-height: calc(100vh - 48px);
+            background-color: #060606;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        /* Chroma red/white animated gradient for title and names */
+        @keyframes chroma-shame {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .shame-chroma {
+            background: linear-gradient(90deg, #ff2222, #ff8888, #ffffff, #ff4444, #ffaaaa, #ffffff, #ff2222);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: chroma-shame 4s ease infinite;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: none;
+        }
+
+        .hoa-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            padding: 0.5rem;
+        }
+
+        .hoa-card {
+            background: #0E0E0E;
+            border: 1px solid #2a2a2a;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hoa-image {
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            border-bottom: 1px solid #2a2a2a;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hoa-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .hoa-content {
+            padding: 0.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hoa-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .hoa-description {
+            color: #b0b0b0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            flex-grow: 1;
+            max-height: calc(1.5rem * 6);
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 0.5rem;
+            padding-left: 0.5rem;
+            text-align: center;
+            width: 100%;
+            white-space: pre-line;
+            word-wrap: break-word;
+            word-break: break-word;
+            scrollbar-width: thin;
+        }
+        .hoa-description::-webkit-scrollbar { display: block; width: 6px; }
+        .hoa-description::-webkit-scrollbar-track { background: #111; }
+        .hoa-description::-webkit-scrollbar-thumb { background-color: #333; }
+        .hoa-description a { color: white; text-decoration: none; }
+        .hoa-description a:hover { text-decoration: underline; }
+
+        .empty-grid {
+            text-align: center;
+            color: #444;
+            padding: 60px 0;
+            font-size: 14px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .hoa-grid { grid-template-columns: 1fr; }
+            .page-title { font-size: 1.8rem; }
+        }
+    </style>
+
+    <nav>
+        <div class="container" style="max-width:1200px;margin:0 auto;padding:0 22.5px;height:48px;display:flex;align-items:center;justify-content:space-between;">
+            <div class="nav-brand"><a href="index.html">Showbin</a></div>
+            <button class="navbar-toggler" type="button">☰</button>
+            <div class="nav-wrapper">
+                <ul class="nav-menu">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="add.html">Add Paste</a></li>
+                    <li><a href="users.html">Users</a></li>
+                    <li><a href="upgrades.html">Upgrades</a></li>
+                    <li class="active"><a href="hof.html">Hall of Shame</a></li>
+                    <li><a href="#" onclick="openContact(event)">Contact</a></li>
+                </ul>
+                <style>
+                    .online-count { display:flex; align-items:center; color:#00ff00; font-size:12px; }
+                    .online-count::before { content:''; display:inline-block; width:6px; height:6px; background:#00ff00; border-radius:50%; margin-right:6px; animation:pulse 2s infinite; box-shadow:0 0 0 0 rgba(0,255,0,.7); }
+                    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(0,255,0,.7)} 70%{box-shadow:0 0 0 6px rgba(0,255,0,0)} 100%{box-shadow:0 0 0 0 rgba(0,255,0,0)} }
+                    .online-count.mobile-only { display:none !important; }
+                </style>
+                <div class="online-count desktop-only" style="display:none;">0</div>
+                <div class="nav-auth">
+                    <li><a href="login.html">Login</a></li>
+                    <li><a href="register.html">Register</a></li>
+                </div>
+            </div>
+        </div>
+    </nav>
+</head>
+<body>
+
+<!-- CONTACT MODAL -->
+<div id="contactModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;" onclick="if(event.target===this)closeContact()">
+    <div style="background:#111;border:1px solid #282828;padding:32px 28px;max-width:360px;width:90%;text-align:center;position:relative;">
+        <button onclick="closeContact()" style="position:absolute;top:10px;right:14px;background:none;border:none;color:#666;font-size:22px;cursor:pointer;line-height:1;">×</button>
+        <h2 style="font-size:17px;font-weight:600;color:#fff;margin-bottom:8px;">Contact Support</h2>
+        <p style="font-size:13px;color:#888;margin-bottom:22px;line-height:1.6;">Reach us on Discord or Telegram for support, inquiries, or reports.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="https://discord.gg/feTqVTrqAk" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;gap:9px;background:#5865F2;color:#fff;padding:11px 22px;text-decoration:none;font-size:13.5px;font-weight:600;" onmouseover="this.style.background='#4752c4'" onmouseout="this.style.background='#5865F2'">
+                <svg viewBox="0 0 24 24" fill="white" style="width:18px;height:18px;"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.03.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 13.93 13.93 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.175 13.175 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                Discord
+            </a>
+            <a href="https://t.me/xd9_aep" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;gap:9px;background:#229ED9;color:#fff;padding:11px 22px;text-decoration:none;font-size:13.5px;font-weight:600;" onmouseover="this.style.background='#1a8abf'" onmouseout="this.style.background='#229ED9'">
+                <svg viewBox="0 0 24 24" fill="white" style="width:18px;height:18px;"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.19 13.67l-2.965-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.963.889z"/></svg>
+                Telegram
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="hoa-wrapper">
+    <div class="container">
+        <h1 class="page-title shame-chroma">Hall of Shame</h1>
+        <div class="hoa-grid" id="hoaGrid">
+            <div class="empty-grid" style="grid-column:1/-1;">No entries yet.</div>
+        </div>
+
+<script>
+    document.querySelector('.navbar-toggler').addEventListener('click', () => document.querySelector('.nav-wrapper').classList.toggle('show'));
+    document.querySelectorAll('.online-count').forEach(el => { el.textContent='42'; el.style.display='flex'; el.classList.add('connected'); });
+    function openContact(e){e.preventDefault();document.getElementById('contactModal').style.display='flex';}
+    function closeContact(){document.getElementById('contactModal').style.display='none';}
+
+    function loadHof(){
+        const entries=JSON.parse(localStorage.getItem('sb_hof')||'[]');
+        const grid=document.getElementById('hoaGrid');
+        if(!entries.length){grid.innerHTML='<div class="empty-grid" style="grid-column:1/-1;">No entries yet.</div>';return;}
+        grid.innerHTML=entries.map(e=>`
+            <div class="hoa-card">
+                ${e.img?`<div class="hoa-image"><img src="${e.img}" alt="${e.title}" onerror="this.parentElement.style.display='none'"></div>`:''}
+                <div class="hoa-content">
+                    <h2 class="hoa-name shame-chroma">${e.title}</h2>
+                    <div class="hoa-description">${e.desc.replace(/\n/g,'<br>')}${e.url?`<br><a href="${e.url}" target="_blank" style="color:#2A9FD6;">paste</a>`:''}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+    loadHof();
+</script>
+</body></html>

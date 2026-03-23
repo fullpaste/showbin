@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+    <title>Contact | Showbin</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="all.min.css">
+    <link rel="stylesheet" href="nav.css">
+    <link rel="stylesheet" href="showbin.css">
+</head>
+<body>
+<nav>
+    <div class="container">
+        <div class="nav-brand">
+            <a href="index.html">Showbin</a>
+            
+        </div>
+        <button class="navbar-toggler" type="button">☰</button>
+        <div class="nav-wrapper">
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="add.html">Add Paste</a></li>
+                <li><a href="users.html">Users</a></li>
+                <li><a href="upgrades.html">Upgrades</a></li>
+                <li><a href="hof.html">Hall of Fame</a></li>
+                <li class="active"><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="online-count desktop-only" style="display:none;">0</div>
+            <div class="nav-auth">
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html">Register</a></li>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="contact-wrap">
+    <h1>Contact</h1>
+    <p>
+        For inquiries, abuse reports, or general questions,<br>
+        reach us on <a href="https://t.me/" target="_blank">Telegram</a>
+        or email us at <a href="mailto:contact@showbin.tld">contact@showbin.tld</a>.
+    </p>
+</div>
+
+<script src="showbin.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded',()=>{
+        document.querySelector('.navbar-toggler').addEventListener('click',()=>document.querySelector('.nav-wrapper').classList.toggle('show'));
+        
+    });
+</script>
+</body>
+</html>
